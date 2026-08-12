@@ -1,0 +1,14 @@
+{
+  "name": "ems-project",
+  "version": "1.0.0",
+  "description": "Employee Management System — MERN Stack",
+  "scripts": {
+    "install:all": "npm --prefix backend install && npm --prefix frontend install",
+    "seed": "npm --prefix backend run seed",
+    "start:backend": "npm --prefix backend start",
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build"
+  },
+  "private": true
+}
