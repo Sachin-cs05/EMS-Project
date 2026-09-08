@@ -1,14 +1,20 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1',
+  baseURL:
+    import.meta.env.VITE_API_URL ||
+    'http://localhost:5000/api/v1',
   timeout: 15000,
 });
 
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('ems_token');
-    if (token) config.headers.Authorization = `Bearer ${token}`;
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
     return config;
   },
   (error) => Promise.reject(error)
@@ -22,6 +28,7 @@ axiosInstance.interceptors.response.use(
       localStorage.removeItem('ems_user');
       window.location.href = '/login';
     }
+
     return Promise.reject(error);
   }
 );

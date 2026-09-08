@@ -31,7 +31,9 @@ const employeeSlice = createSlice({
       .addCase(fetchEmployees.pending,   (s) => { s.loading = true; s.error = null; })
       .addCase(fetchEmployees.fulfilled, (s, { payload }) => { s.loading = false; s.list = payload.employees; s.pagination = payload.pagination; })
       .addCase(fetchEmployees.rejected,  (s, { payload }) => { s.loading = false; s.error = payload; })
-      .addCase(fetchEmployee.fulfilled,  (s, { payload }) => { s.selected = payload; })
+      .addCase(fetchEmployee.pending,    (s) => { s.loading = true; s.selected = null; s.error = null; })
+      .addCase(fetchEmployee.fulfilled,  (s, { payload }) => { s.loading = false; s.selected = payload; })
+      .addCase(fetchEmployee.rejected,   (s, { payload }) => { s.loading = false; s.error = payload; })
       .addCase(createEmployee.fulfilled, (s, { payload }) => { s.list.unshift(payload); })
       .addCase(updateEmployee.fulfilled, (s, { payload }) => {
         const i = s.list.findIndex(e => e._id === payload._id);

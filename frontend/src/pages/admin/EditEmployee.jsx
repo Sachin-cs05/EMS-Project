@@ -21,7 +21,7 @@ export default function EditEmployee() {
   const { id }     = useParams();
   const dispatch   = useDispatch();
   const navigate   = useNavigate();
-  const { selected: employee, loading } = useSelector((s) => s.employees);
+  const { selected: employee, loading, error } = useSelector((s) => s.employees);
   const { list: departments }           = useSelector((s) => s.departments);
   const [preview,    setPreview]    = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -78,8 +78,16 @@ export default function EditEmployee() {
     }
   };
 
-  if (loading && !employee) {
+  if (loading || (!employee && !error)) {
     return <div className="grid grid-cols-2 gap-4 max-w-3xl">{Array(6).fill(0).map((_, i) => <SkeletonCard key={i} />)}</div>;
+  }
+
+  if (error || !employee) {
+    return (
+      <div className="card max-w-3xl p-6 text-sm text-gray-500 dark:text-gray-400">
+        {error || 'Employee not found'}
+      </div>
+    );
   }
 
   return (

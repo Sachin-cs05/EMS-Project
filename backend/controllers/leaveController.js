@@ -1,8 +1,12 @@
 import Leave        from '../models/Leave.js';
 import Employee     from '../models/Employee.js';
-import Notification from '../models/Notification.js';
 import User         from '../models/User.js';
+import mongoose     from 'mongoose';
 import sendEmail    from '../utils/sendEmail.js';
+import {
+  createNotificationSafely,
+  notifyActiveAdminsSafely,
+} from '../utils/notificationService.js';
 import ApiError     from '../utils/ApiError.js';
 import ApiResponse  from '../utils/ApiResponse.js';
 
@@ -11,12 +15,30 @@ export const applyLeave = async (req, res, next) => {
   try {
     const { leaveType, startDate, endDate, reason } = req.body;
 
+    if (!['sick', 'casual', 'earned'].includes(leaveType)) {
+      return next(new ApiError(400, 'Invalid leave type'));
+    }
+
+    const parsedStartDate = new Date(startDate);
+    const parsedEndDate = new Date(endDate);
+
+    if (
+      Number.isNaN(parsedStartDate.getTime()) ||
+      Number.isNaN(parsedEndDate.getTime())
+    ) {
+      return next(new ApiError(400, 'Enter valid leave dates'));
+    }
+
+    if (parsedEndDate < parsedStartDate) {
+      return next(new ApiError(400, 'End date cannot be before start date'));
+    }
+
     const employee = await Employee.findOne({ userId: req.user._id });
     if (!employee) return next(new ApiError(404, 'Employee profile not found'));
 
     // Calculate days
     const days = Math.ceil(
-      (new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)
+      (parsedEndDate - parsedStartDate) / (1000 * 60 * 60 * 24)
     ) + 1;
 
     // Check leave balance
@@ -30,7 +52,7 @@ export const applyLeave = async (req, res, next) => {
       employee: employee._id,
       status:   { $in: ['pending', 'approved'] },
       $or: [
-        { startDate: { $lte: new Date(endDate)   }, endDate: { $gte: new Date(startDate) } },
+        { startDate: { $lte: parsedEndDate }, endDate: { $gte: parsedStartDate } },
       ],
     });
     if (overlap) {
@@ -40,22 +62,17 @@ export const applyLeave = async (req, res, next) => {
     const leave = await Leave.create({
       employee:  employee._id,
       leaveType,
-      startDate: new Date(startDate),
-      endDate:   new Date(endDate),
+      startDate: parsedStartDate,
+      endDate:   parsedEndDate,
       reason,
     });
 
-    // Notify all admins
-    const admins = await User.find({ role: 'admin', isActive: true });
-    await Notification.insertMany(
-      admins.map(a => ({
-        recipient: a._id,
-        title:     'New Leave Request',
-        message:   `${employee.firstName} ${employee.lastName} applied for ${days} day(s) of ${leaveType} leave.`,
-        type:      'leave_applied',
-        link:      `/admin/leaves`,
-      }))
-    );
+    await notifyActiveAdminsSafely({
+      title: 'New Leave Request',
+      message: `${employee.firstName} ${employee.lastName} applied for ${days} day(s) of ${leaveType} leave from ${new Date(startDate).toLocaleDateString()} to ${new Date(endDate).toLocaleDateString()}.`,
+      type: 'leave_applied',
+      link: '/admin/leaves',
+    }, User);
 
     res.status(201).json(new ApiResponse(201, { leave }, 'Leave application submitted'));
   } catch (e) { next(e); }
@@ -80,10 +97,15 @@ export const getMyLeaves = async (req, res, next) => {
 // ─── CANCEL LEAVE (Employee) ──────────────────────────────────────────────────
 export const cancelLeave = async (req, res, next) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return next(new ApiError(400, 'Invalid leave ID'));
+    }
+
     const leave    = await Leave.findById(req.params.id);
     const employee = await Employee.findOne({ userId: req.user._id });
 
     if (!leave) return next(new ApiError(404, 'Leave not found'));
+    if (!employee) return next(new ApiError(404, 'Employee profile not found'));
     if (leave.employee.toString() !== employee._id.toString()) {
       return next(new ApiError(403, 'Access denied'));
     }
@@ -126,6 +148,10 @@ export const getAllLeaves = async (req, res, next) => {
 // ─── APPROVE LEAVE (Admin) ────────────────────────────────────────────────────
 export const approveLeave = async (req, res, next) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return next(new ApiError(400, 'Invalid leave ID'));
+    }
+
     const leave = await Leave.findById(req.params.id).populate('employee');
     if (!leave) return next(new ApiError(404, 'Leave not found'));
     if (leave.status !== 'pending') {
@@ -144,7 +170,7 @@ export const approveLeave = async (req, res, next) => {
     await employee.save();
 
     // Notify employee
-    await Notification.create({
+    await createNotificationSafely({
       recipient: leave.employee.userId,
       title:     'Leave Approved ✅',
       message:   `Your ${leave.leaveType} leave request for ${leave.totalDays} day(s) has been approved.`,
@@ -169,6 +195,10 @@ export const approveLeave = async (req, res, next) => {
 // ─── REJECT LEAVE (Admin) ─────────────────────────────────────────────────────
 export const rejectLeave = async (req, res, next) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return next(new ApiError(400, 'Invalid leave ID'));
+    }
+
     const { note } = req.body;
     const leave = await Leave.findById(req.params.id).populate('employee');
     if (!leave) return next(new ApiError(404, 'Leave not found'));
@@ -182,7 +212,7 @@ export const rejectLeave = async (req, res, next) => {
     leave.reviewedAt = new Date();
     await leave.save();
 
-    await Notification.create({
+    await createNotificationSafely({
       recipient: leave.employee.userId,
       title:     'Leave Rejected ❌',
       message:   `Your ${leave.leaveType} leave request has been rejected. ${note ? `Reason: ${note}` : ''}`,

@@ -98,15 +98,6 @@ export default function LoginPage() {
           <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">Welcome back</h2>
           <p className="text-slate-500 dark:text-slate-400 mb-8 text-sm">Sign in to your EMS Pro account</p>
 
-          {/* Demo credentials */}
-          <div className="mb-6 p-4 rounded-2xl bg-primary-50 dark:bg-primary-500/10 border border-primary-100 dark:border-primary-500/20">
-            <p className="text-xs font-semibold text-primary-700 dark:text-primary-400 mb-2">Demo Credentials</p>
-            <div className="space-y-1 text-xs text-primary-600 dark:text-primary-300">
-              <p>Admin: <span className="font-mono font-bold">admin@ems.com</span> / <span className="font-mono font-bold">Admin@123</span></p>
-              <p>Employee: <span className="font-mono font-bold">emp@ems.com</span> / <span className="font-mono font-bold">Emp@123</span></p>
-            </div>
-          </div>
-
           {/* Error */}
           {error && (
             <motion.div

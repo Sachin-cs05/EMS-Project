@@ -19,6 +19,10 @@ import dashboardRoutes    from './routes/dashboardRoutes.js';
 
 dotenv.config();
 
+if (!process.env.MONGODB_URI || !process.env.JWT_SECRET) {
+  throw new Error('MONGODB_URI and JWT_SECRET environment variables are required');
+}
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname  = path.dirname(__filename);
 const allowedOrigins = (process.env.CLIENT_URLS || process.env.CLIENT_URL || 'http://localhost:5173')
@@ -82,10 +86,10 @@ app.get('/api/health', (_req, res) => {
 app.use('/api/v1/auth',          authRoutes);
 app.use('/api/v1/employees',     employeeRoutes);
 app.use('/api/v1/departments',   departmentRoutes);
+app.use('/api/v1/dashboard', dashboardRoutes);
 app.use('/api/v1/attendance',    attendanceRoutes);
 app.use('/api/v1/leaves',        leaveRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
-app.use('/api/v1/dashboard',     dashboardRoutes);
 
 // Error handling
 app.use(notFound);

@@ -187,10 +187,13 @@ export function AddEmployee() {
         <FormSection title="Account Credentials">
           <Field label="Initial Password *" error={errors.password?.message}>
             <input type="password" className={`input ${errors.password ? 'input-error' : ''}`}
-              placeholder="Min 6 characters"
+              placeholder="At least 8 characters"
               {...register('password', {
                 required: 'Password is required',
-                minLength: { value: 6, message: 'Min 6 characters' },
+                minLength: { value: 8, message: 'Min 8 characters' },
+                validate: (value) =>
+                  /[A-Z]/.test(value) && /[a-z]/.test(value) && /[0-9]/.test(value) ||
+                  'Use uppercase, lowercase, and a number',
               })} />
           </Field>
           <div className="flex items-end pb-1">

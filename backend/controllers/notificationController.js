@@ -1,9 +1,13 @@
 import Notification from '../models/Notification.js';
+
+import ApiError from '../utils/ApiError.js';
 import ApiResponse from '../utils/ApiResponse.js';
 
 export const getNotifications = async (req, res, next) => {
   try {
-    const notifications = await Notification.find({ recipient: req.user._id })
+    const notifications = await Notification.find({
+      recipient: req.user._id,
+    })
       .sort({ createdAt: -1 })
       .limit(20);
 
@@ -12,8 +16,15 @@ export const getNotifications = async (req, res, next) => {
       isRead: false,
     });
 
-    res.status(200).json(
-      new ApiResponse(200, { notifications, unreadCount }, 'Notifications fetched')
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        {
+          notifications,
+          unreadCount,
+        },
+        'Notifications fetched successfully'
+      )
     );
   } catch (error) {
     next(error);
@@ -22,12 +33,32 @@ export const getNotifications = async (req, res, next) => {
 
 export const markAsRead = async (req, res, next) => {
   try {
-    await Notification.findOneAndUpdate(
-      { _id: req.params.id, recipient: req.user._id },
-      { isRead: true }
+    const notification = await Notification.findOneAndUpdate(
+      {
+        _id: req.params.id,
+        recipient: req.user._id,
+      },
+      {
+        isRead: true,
+      },
+      {
+        new: true,
+      }
     );
 
-    res.status(200).json(new ApiResponse(200, null, 'Marked as read'));
+    if (!notification) {
+      return next(
+        new ApiError(404, 'Notification not found')
+      );
+    }
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        { notification },
+        'Notification marked as read'
+      )
+    );
   } catch (error) {
     next(error);
   }
@@ -36,11 +67,22 @@ export const markAsRead = async (req, res, next) => {
 export const markAllAsRead = async (req, res, next) => {
   try {
     await Notification.updateMany(
-      { recipient: req.user._id, isRead: false },
-      { isRead: true }
+      {
+        recipient: req.user._id,
+        isRead: false,
+      },
+      {
+        isRead: true,
+      }
     );
 
-    res.status(200).json(new ApiResponse(200, null, 'All notifications marked as read'));
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        null,
+        'All notifications marked as read'
+      )
+    );
   } catch (error) {
     next(error);
   }

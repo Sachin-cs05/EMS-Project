@@ -3,6 +3,7 @@
 // ════════════════════════════════════════════════════════════════════════════
 import Department from '../models/Department.js';
 import Employee   from '../models/Employee.js';
+import mongoose   from 'mongoose';
 import ApiError   from '../utils/ApiError.js';
 import ApiResponse from '../utils/ApiResponse.js';
 
@@ -30,6 +31,10 @@ export const createDepartment = async (req, res, next) => {
 
 export const updateDepartment = async (req, res, next) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return next(new ApiError(400, 'Invalid department ID'));
+    }
+
     const dept = await Department.findByIdAndUpdate(
       req.params.id,
       { $set: req.body },
@@ -42,11 +47,19 @@ export const updateDepartment = async (req, res, next) => {
 
 export const deleteDepartment = async (req, res, next) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return next(new ApiError(400, 'Invalid department ID'));
+    }
+
     const count = await Employee.countDocuments({ department: req.params.id, status: 'active' });
     if (count > 0) {
       return next(new ApiError(400, `Cannot delete — ${count} active employee(s) are in this department`));
     }
-    await Department.findByIdAndDelete(req.params.id);
+    const department = await Department.findByIdAndDelete(req.params.id);
+
+    if (!department) {
+      return next(new ApiError(404, 'Department not found'));
+    }
     res.status(200).json(new ApiResponse(200, null, 'Department deleted'));
   } catch (e) { next(e); }
 };

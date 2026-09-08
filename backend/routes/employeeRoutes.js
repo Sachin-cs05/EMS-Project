@@ -6,7 +6,7 @@ import {
   getAllEmployees, getEmployee, createEmployee,
   updateEmployee, deleteEmployee, uploadProfileImage,
 } from '../controllers/employeeController.js';
-import { protect, adminOnly } from '../middleware/authMiddleware.js';
+import { protect, adminOnly, authorize } from '../middleware/authMiddleware.js';
 import upload from '../middleware/uploadMiddleware.js';
 
 const router = express.Router();
@@ -17,11 +17,16 @@ router.route('/')
   .post(adminOnly, upload.single('profileImage'), createEmployee);
 
 router.route('/:id')
-  .get(getEmployee)
+  .get(authorize('admin', 'employee'), getEmployee)
   .put(adminOnly, upload.single('profileImage'), updateEmployee)
   .delete(adminOnly, deleteEmployee);
 
-router.put('/:id/profile-image', upload.single('profileImage'), uploadProfileImage);
+router.put(
+  '/:id/profile-image',
+  authorize('admin', 'employee'),
+  upload.single('profileImage'),
+  uploadProfileImage
+);
 
 export default router;
 

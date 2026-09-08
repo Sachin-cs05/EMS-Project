@@ -6,12 +6,14 @@ import attendanceReducer   from '../features/attendance/attendanceSlice';
 import leaveReducer        from '../features/leave/leaveSlice';
 import notificationReducer from '../features/notification/notificationSlice';
 import uiReducer           from '../features/ui/uiSlice';
+import dashboardReducer from '../features/dashboard/dashboardSlice';
 
 export const store = configureStore({
   reducer: {
     auth:          authReducer,
     employees:     employeeReducer,
     departments:   departmentReducer,
+    dashboard: dashboardReducer,
     attendance:    attendanceReducer,
     leaves:        leaveReducer,
     notifications: notificationReducer,

@@ -61,7 +61,13 @@ export const login = async (req, res, next) => {
 // ─── GET CURRENT USER ─────────────────────────────────────────────────────────
 export const getMe = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user._id).select(
+      '-resetPasswordToken -resetPasswordExpires'
+    );
+
+    if (!user) {
+      return next(new ApiError(401, 'User no longer exists'));
+    }
     let employeeProfile = null;
 
     if (user.role === 'employee') {

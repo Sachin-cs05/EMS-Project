@@ -147,10 +147,13 @@ export default function MyProfile() {
               <input
                 type={showNew ? 'text' : 'password'}
                 className={`input pr-10 ${errors.newPassword ? 'input-error' : ''}`}
-                placeholder="Min 6 characters"
+                placeholder="At least 8 characters"
                 {...register('newPassword', {
                   required: 'Required',
-                  minLength: { value: 6, message: 'Min 6 chars' },
+                  minLength: { value: 8, message: 'Min 8 characters' },
+                  validate: (value) =>
+                    /[A-Z]/.test(value) && /[a-z]/.test(value) && /[0-9]/.test(value) ||
+                    'Use uppercase, lowercase, and a number',
                 })}
               />
               <button

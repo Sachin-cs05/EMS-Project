@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { HiOutlineClock, HiOutlineDocumentText, HiOutlineCheckCircle, HiOutlineCalendar, HiOutlinePlus } from 'react-icons/hi';
-import { fetchTodayAtt, checkIn, checkOut, fetchMyLeaves, fetchNotifications } from '../../features/slices';
+import { fetchTodayAtt, checkIn, checkOut, fetchMyLeaves } from '../../features/slices';
 import { showToast } from '../../features/slices';
 import { Badge, Avatar } from '../../components/common/index.jsx';
 import { formatTime, formatDate } from '../../components/common/timeUtils';
@@ -21,7 +21,6 @@ export function EmployeeDashboard() {
   useEffect(() => {
     dispatch(fetchTodayAtt());
     dispatch(fetchMyLeaves());
-    dispatch(fetchNotifications());
   }, []);
 
   const handleCheckIn = async () => {

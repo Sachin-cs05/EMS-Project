@@ -13,12 +13,20 @@ import { formatDate } from '../../components/common/timeUtils';
 export function EmployeeProfile() {
   const { id } = useParams();
   const dispatch = useDispatch();
-  const { selected: emp, loading } = useSelector((s) => s.employees);
+  const { selected: emp, loading, error } = useSelector((s) => s.employees);
 
   useEffect(() => { dispatch(fetchEmployee(id)); }, [id]);
 
-  if (loading || !emp) {
+  if (loading || (!emp && !error)) {
     return <div className="grid grid-cols-2 gap-4 max-w-4xl">{Array(6).fill(0).map((_, i) => <SkeletonCard key={i} />)}</div>;
+  }
+
+  if (error || !emp) {
+    return (
+      <div className="card max-w-4xl p-6 text-sm text-gray-500 dark:text-gray-400">
+        {error || 'Employee not found'}
+      </div>
+    );
   }
 
   return (

@@ -8,15 +8,15 @@ import {
   markAttendance,
   getAttendanceReport,
 } from '../controllers/attendanceController.js';
-import { protect, adminOnly } from '../middleware/authMiddleware.js';
+import { protect, adminOnly, authorize } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 router.use(protect);
 
-router.post('/check-in',     checkIn);
-router.put('/check-out',     checkOut);
-router.get('/today',         getTodayAttendance);
-router.get('/my-history',    getMyAttendance);
+router.post('/check-in',     authorize('employee'), checkIn);
+router.put('/check-out',     authorize('employee'), checkOut);
+router.get('/today',         authorize('employee'), getTodayAttendance);
+router.get('/my-history',    authorize('employee'), getMyAttendance);
 router.get('/',              adminOnly, getAllAttendance);
 router.post('/mark',         adminOnly, markAttendance);
 router.get('/report',        adminOnly, getAttendanceReport);

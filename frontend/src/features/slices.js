@@ -2,6 +2,7 @@
 export * from './auth/authSlice';
 export * from './employee/employeeSlice';
 export * from './department/departmentSlice';
+export * from './dashboard/dashboardSlice';
 export * from './attendance/attendanceSlice';
 export * from './leave/leaveSlice';
 export * from './notification/notificationSlice';

@@ -4,6 +4,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import ProtectedRoute from './ProtectedRoute';
 import AdminRoute from './AdminRoute';
+import EmployeeRoute from './EmployeeRoute';
 
 const LoginPage = lazy(() => import('../pages/auth/LoginPage'));
 const ForgotPasswordPage = lazy(() => import('../pages/auth/ForgotPasswordPage'));
@@ -65,12 +66,14 @@ export default function AppRouter() {
             </Route>
           </Route>
 
-          <Route element={<DashboardLayout role="employee" />}>
-            <Route path="/employee" element={<EmployeeDashboard />} />
-            <Route path="/employee/profile" element={<MyProfile />} />
-            <Route path="/employee/attendance" element={<MyAttendance />} />
-            <Route path="/employee/leaves" element={<LeaveHistory />} />
-            <Route path="/employee/leaves/apply" element={<ApplyLeave />} />
+          <Route element={<EmployeeRoute />}>
+            <Route element={<DashboardLayout role="employee" />}>
+              <Route path="/employee" element={<EmployeeDashboard />} />
+              <Route path="/employee/profile" element={<MyProfile />} />
+              <Route path="/employee/attendance" element={<MyAttendance />} />
+              <Route path="/employee/leaves" element={<LeaveHistory />} />
+              <Route path="/employee/leaves/apply" element={<ApplyLeave />} />
+            </Route>
           </Route>
         </Route>
 

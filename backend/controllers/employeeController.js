@@ -4,11 +4,12 @@ import mongoose from 'mongoose';
 
 import User from '../models/User.js';
 import Employee from '../models/Employee.js';
-import Notification from '../models/Notification.js';
 import Department from '../models/Department.js';
 import sendEmail from '../utils/sendEmail.js';
+import { createNotificationSafely } from '../utils/notificationService.js';
 import ApiError from '../utils/ApiError.js';
 import ApiResponse from '../utils/ApiResponse.js';
+import validatePassword from '../utils/passwordValidator.js';
 
 // ─── GET ALL EMPLOYEES (Admin) ────────────────────────────────────────────────
 
@@ -24,15 +25,41 @@ export const getAllEmployees = async (req, res, next) => {
       order = 'desc',
     } = req.query;
 
+    const allowedSortFields = [
+      'createdAt',
+      'updatedAt',
+      'firstName',
+      'lastName',
+      'email',
+      'employeeId',
+      'designation',
+      'salary',
+      'joiningDate',
+      'status',
+    ];
+
+    if (!allowedSortFields.includes(sortBy)) {
+      return next(new ApiError(400, 'Invalid sort field'));
+    }
+
+    if (!['asc', 'desc'].includes(order)) {
+      return next(new ApiError(400, 'Invalid sort order'));
+    }
+
     const query = {};
+
+    const escapedSearch = search.replace(
+      /[.*+?^${}()|[\]\\]/g,
+      '\\$&'
+    );
 
     if (search) {
       query.$or = [
-        { firstName: { $regex: search, $options: 'i' } },
-        { lastName: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } },
-        { employeeId: { $regex: search, $options: 'i' } },
-        { designation: { $regex: search, $options: 'i' } },
+        { firstName: { $regex: escapedSearch, $options: 'i' } },
+        { lastName: { $regex: escapedSearch, $options: 'i' } },
+        { email: { $regex: escapedSearch, $options: 'i' } },
+        { employeeId: { $regex: escapedSearch, $options: 'i' } },
+        { designation: { $regex: escapedSearch, $options: 'i' } },
       ];
     }
 
@@ -140,7 +167,7 @@ export const createEmployee = async (req, res, next) => {
       designation,
       salary,
       joiningDate,
-      password = 'Employee@123',
+      password,
     } = req.body;
 
     // ─── Basic validation ────────────────────────────────────────────────────
@@ -202,6 +229,12 @@ export const createEmployee = async (req, res, next) => {
 
     if (!joiningDate) {
       return next(new ApiError(400, 'Joining date is required'));
+    }
+
+    const passwordError = validatePassword(password);
+
+    if (passwordError) {
+      return next(new ApiError(400, passwordError));
     }
 
     const parsedJoiningDate = new Date(joiningDate);
@@ -309,6 +342,14 @@ export const createEmployee = async (req, res, next) => {
 
     const populated = await Employee.findById(employee._id)
       .populate('department', 'name');
+
+    await createNotificationSafely({
+      recipient: user._id,
+      title: 'Employee Profile Created',
+      message: 'Your employee profile has been created successfully.',
+      type: 'system',
+      link: '/employee/profile',
+    });
 
     res.status(201).json(
       new ApiResponse(
@@ -469,6 +510,8 @@ export const updateEmployee = async (req, res, next) => {
       employee.profileImage = `/uploads/${req.file.filename}`;
     }
 
+    const employeeWasUpdated = employee.isModified();
+
     await employee.save();
 
     // ─── Sync User account status ─────────────────────────────────────────────
@@ -496,6 +539,16 @@ export const updateEmployee = async (req, res, next) => {
 
     const updated = await Employee.findById(employee._id)
       .populate('department', 'name');
+
+    if (employeeWasUpdated) {
+      await createNotificationSafely({
+        recipient: employee.userId,
+        title: 'Employee Profile Updated',
+        message: 'Your employee profile has been updated by an administrator.',
+        type: 'system',
+        link: '/employee/profile',
+      });
+    }
 
     res.status(200).json(
       new ApiResponse(

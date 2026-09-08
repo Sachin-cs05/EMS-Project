@@ -58,9 +58,15 @@ export default function ResetPasswordPage() {
                 <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">New Password</label>
                 <div className="relative">
                   <HiOutlineLockClosed size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input type={showPwd ? 'text' : 'password'} placeholder="Min 6 characters"
+                  <input type={showPwd ? 'text' : 'password'} placeholder="At least 8 characters"
                     className={`input pl-10 pr-10 ${errors.password ? 'input-error' : ''}`}
-                    {...register('password', { required: 'Required', minLength: { value: 6, message: 'Min 6 chars' } })} />
+                    {...register('password', {
+                      required: 'Required',
+                      minLength: { value: 8, message: 'Min 8 characters' },
+                      validate: (value) =>
+                        /[A-Z]/.test(value) && /[a-z]/.test(value) && /[0-9]/.test(value) ||
+                        'Use uppercase, lowercase, and a number',
+                    })} />
                   <button type="button" onClick={() => setShowPwd(!showPwd)}
                     className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400">
                     {showPwd ? <HiOutlineEyeOff size={16} /> : <HiOutlineEye size={16} />}

@@ -8,7 +8,7 @@ import Department from '../models/Department.js';
 
 dotenv.config();
 
-const DEFAULT_EMP_PASSWORD = process.env.EMPLOYEE_PASSWORD || 'Emp@123';
+const DEFAULT_EMP_PASSWORD = process.env.EMPLOYEE_PASSWORD;
 
 const legacyDepartmentAliases = {
   HR: 'Human Resources',
@@ -175,6 +175,16 @@ const migrateLegacyEmployees = async () => {
 
 const seed = async () => {
   try {
+    if (
+      !process.env.MONGODB_URI ||
+      !process.env.ADMIN_PASSWORD ||
+      !DEFAULT_EMP_PASSWORD
+    ) {
+      throw new Error(
+        'MONGODB_URI, ADMIN_PASSWORD, and EMPLOYEE_PASSWORD environment variables are required'
+      );
+    }
+
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('✅ MongoDB connected');
     await migrateLegacyEmployees();
@@ -192,7 +202,7 @@ const seed = async () => {
 
     // ── Create Admin user ───────────────────────────────────────────────────
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@ems.com';
-    const adminPwd   = process.env.ADMIN_PASSWORD || 'Admin@123';
+    const adminPwd   = process.env.ADMIN_PASSWORD;
 
     let admin = await User.findOne({ email: adminEmail });
     if (!admin) {
@@ -202,7 +212,7 @@ const seed = async () => {
         password: adminPwd,
         role:     'admin',
       });
-      console.log(`✅ Admin user created: ${adminEmail} / ${adminPwd}`);
+      console.log(`✅ Admin user created: ${adminEmail}`);
     } else {
       console.log(`ℹ️  Admin already exists: ${adminEmail}`);
     }
@@ -220,8 +230,7 @@ const seed = async () => {
     ];
 
     // First employee becomes the demo "emp@ems.com" login
-    const demoEmpEmail = 'emp@ems.com';
-    const demoEmpPwd   = 'Emp@123';
+    const demoEmpEmail = process.env.DEMO_EMPLOYEE_EMAIL || 'emp@ems.com';
 
     for (let i = 0; i < sampleEmployees.length; i++) {
       const s = sampleEmployees[i];
@@ -236,7 +245,7 @@ const seed = async () => {
       const user = await User.create({
         name:     `${s.firstName} ${s.lastName}`,
         email:    emailToUse,
-        password: i === 0 ? demoEmpPwd : DEFAULT_EMP_PASSWORD,
+        password: DEFAULT_EMP_PASSWORD,
         role:     'employee',
       });
 
@@ -264,12 +273,10 @@ const seed = async () => {
 
     console.log('\n🎉 Seed completed successfully!\n');
     console.log('────────────────────────────────────');
-    console.log('Admin Login:');
-    console.log(`  Email:    ${adminEmail}`);
-    console.log(`  Password: ${adminPwd}`);
-    console.log('\nEmployee Login:');
-    console.log(`  Email:    ${demoEmpEmail}`);
-    console.log(`  Password: ${demoEmpPwd}`);
+    console.log('Admin account email:');
+    console.log(`  ${adminEmail}`);
+    console.log('\nDemo employee account email:');
+    console.log(`  ${demoEmpEmail}`);
     console.log('────────────────────────────────────\n');
 
     process.exit(0);

@@ -14,7 +14,7 @@ const router = express.Router();
 router.use(protect);
 
 router.route('/')
-  .get(getDepartments)
+  .get(adminOnly, getDepartments)
   .post(adminOnly, createDepartment);
 
 router.route('/:id')

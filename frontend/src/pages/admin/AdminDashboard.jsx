@@ -1,19 +1,6 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
-import {
-  HiOutlineUsers,
-  HiOutlineOfficeBuilding,
-  HiOutlineUserGroup,
-  HiOutlineClipboardList,
-  HiOutlinePlus,
-  HiOutlineArrowRight,
-  HiOutlineCalendar,
-  HiOutlineClock,
-  HiOutlineCheckCircle,
-  HiOutlineExclamationCircle,
-} from 'react-icons/hi';
-
 import { useDashboard } from '../../hooks/useDashboard';
 
 import {
@@ -28,6 +15,19 @@ import DepartmentPieChart from '../../components/charts/DepartmentPieChart';
 import AttendanceTrendChart from '../../components/charts/AttendanceTrendChart';
 import EmployeeGrowthChart from '../../components/charts/EmployeeGrowthChart';
 import LeaveStatsChart from '../../components/charts/LeaveStatsChart';
+
+import {
+  HiOutlineUsers,
+  HiOutlineOfficeBuilding,
+  HiOutlineUserGroup,
+  HiOutlineClipboardList,
+  HiOutlinePlus,
+  HiOutlineArrowRight,
+  HiOutlineCalendar,
+  HiOutlineClock,
+  HiOutlineCheckCircle,
+  HiOutlineExclamationCircle,
+} from 'react-icons/hi';
 
 
 /* =========================================================
@@ -67,39 +67,27 @@ function StatCard({
 }) {
   const styles = {
     blue: {
-      iconBg:
-        'bg-indigo-50 dark:bg-indigo-500/10',
-      icon:
-        'text-indigo-600 dark:text-indigo-400',
-      glow:
-        'group-hover:shadow-indigo-500/10',
+      iconBg: 'bg-indigo-50 dark:bg-indigo-500/10',
+      icon: 'text-indigo-600 dark:text-indigo-400',
+      glow: 'group-hover:shadow-indigo-500/10',
     },
 
     green: {
-      iconBg:
-        'bg-emerald-50 dark:bg-emerald-500/10',
-      icon:
-        'text-emerald-600 dark:text-emerald-400',
-      glow:
-        'group-hover:shadow-emerald-500/10',
+      iconBg: 'bg-emerald-50 dark:bg-emerald-500/10',
+      icon: 'text-emerald-600 dark:text-emerald-400',
+      glow: 'group-hover:shadow-emerald-500/10',
     },
 
     purple: {
-      iconBg:
-        'bg-violet-50 dark:bg-violet-500/10',
-      icon:
-        'text-violet-600 dark:text-violet-400',
-      glow:
-        'group-hover:shadow-violet-500/10',
+      iconBg: 'bg-violet-50 dark:bg-violet-500/10',
+      icon: 'text-violet-600 dark:text-violet-400',
+      glow: 'group-hover:shadow-violet-500/10',
     },
 
     amber: {
-      iconBg:
-        'bg-amber-50 dark:bg-amber-500/10',
-      icon:
-        'text-amber-600 dark:text-amber-400',
-      glow:
-        'group-hover:shadow-amber-500/10',
+      iconBg: 'bg-amber-50 dark:bg-amber-500/10',
+      icon: 'text-amber-600 dark:text-amber-400',
+      glow: 'group-hover:shadow-amber-500/10',
     },
   };
 
@@ -133,7 +121,6 @@ function StatCard({
         ${style.glow}
       `}
     >
-      {/* Decorative glow */}
       <div
         className="
           absolute
@@ -152,7 +139,6 @@ function StatCard({
       />
 
       <div className="relative">
-        {/* Top */}
         <div className="flex items-center justify-between">
           <div
             className={`
@@ -195,7 +181,6 @@ function StatCard({
           </span>
         </div>
 
-        {/* Content */}
         <div className="mt-5">
           <p
             className="
@@ -221,13 +206,7 @@ function StatCard({
             {title}
           </p>
 
-          <p
-            className="
-              mt-1
-              text-xs
-              text-slate-400
-            "
-          >
+          <p className="mt-1 text-xs text-slate-400">
             {subtitle}
           </p>
         </div>
@@ -248,35 +227,27 @@ function AttendanceItem({
 }) {
   const config = {
     present: {
-      dot: 'bg-emerald-500',
       bg: 'bg-emerald-50 dark:bg-emerald-500/[0.07]',
       icon: HiOutlineCheckCircle,
-      iconColor:
-        'text-emerald-500',
+      iconColor: 'text-emerald-500',
     },
 
     absent: {
-      dot: 'bg-red-500',
       bg: 'bg-red-50 dark:bg-red-500/[0.07]',
       icon: HiOutlineExclamationCircle,
-      iconColor:
-        'text-red-500',
+      iconColor: 'text-red-500',
     },
 
     late: {
-      dot: 'bg-amber-500',
       bg: 'bg-amber-50 dark:bg-amber-500/[0.07]',
       icon: HiOutlineClock,
-      iconColor:
-        'text-amber-500',
+      iconColor: 'text-amber-500',
     },
 
     half: {
-      dot: 'bg-indigo-500',
       bg: 'bg-indigo-50 dark:bg-indigo-500/[0.07]',
       icon: HiOutlineCalendar,
-      iconColor:
-        'text-indigo-500',
+      iconColor: 'text-indigo-500',
     },
   };
 
@@ -339,7 +310,7 @@ function AttendanceItem({
           dark:text-white
         "
       >
-        {value}
+        {value ?? 0}
       </p>
     </div>
   );
@@ -408,10 +379,72 @@ function SectionHeader({
         >
           {linkText}
 
-          <HiOutlineArrowRight
-            size={13}
-          />
+          <HiOutlineArrowRight size={13} />
         </Link>
+      )}
+    </div>
+  );
+}
+
+
+/* =========================================================
+   LOADING ITEM
+========================================================= */
+
+function ActivitySkeleton({ badge = false }) {
+  return (
+    <div
+      className="
+        flex
+        items-center
+        gap-3
+        p-3
+        rounded-xl
+        animate-pulse
+      "
+    >
+      <div
+        className="
+          w-10
+          h-10
+          rounded-full
+          bg-slate-200
+          dark:bg-white/10
+        "
+      />
+
+      <div className="flex-1 space-y-2">
+        <div
+          className="
+            h-3
+            bg-slate-200
+            dark:bg-white/10
+            rounded
+            w-32
+          "
+        />
+
+        <div
+          className="
+            h-2.5
+            bg-slate-200
+            dark:bg-white/10
+            rounded
+            w-24
+          "
+        />
+      </div>
+
+      {badge && (
+        <div
+          className="
+            w-14
+            h-5
+            rounded-full
+            bg-slate-200
+            dark:bg-white/10
+          "
+        />
       )}
     </div>
   );
@@ -431,6 +464,11 @@ export default function AdminDashboard() {
     chartsLoading,
     activityLoading,
   } = useDashboard();
+
+
+  /* =======================================================
+     STAT CARDS
+  ======================================================= */
 
   const statCards = [
     {
@@ -465,6 +503,7 @@ export default function AdminDashboard() {
       color: 'amber',
     },
   ];
+
 
   return (
     <div className="space-y-7 saas-page-enter">
@@ -555,9 +594,7 @@ export default function AdminDashboard() {
             sm:self-auto
           "
         >
-          <HiOutlinePlus
-            size={17}
-          />
+          <HiOutlinePlus size={17} />
 
           Add Employee
         </Link>
@@ -577,16 +614,14 @@ export default function AdminDashboard() {
           gap-4
         "
       >
-        {statCards.map(
-          (card, index) => (
-            <StatCard
-              key={card.title}
-              {...card}
-              loading={statsLoading}
-              index={index}
-            />
-          )
-        )}
+        {statCards.map((card, index) => (
+          <StatCard
+            key={card.title}
+            {...card}
+            loading={statsLoading}
+            index={index}
+          />
+        ))}
       </div>
 
 
@@ -628,33 +663,25 @@ export default function AdminDashboard() {
           >
             <AttendanceItem
               label="Present"
-              value={
-                stats.todayAttendance.present
-              }
+              value={stats.todayAttendance.present}
               type="present"
             />
 
             <AttendanceItem
               label="Absent"
-              value={
-                stats.todayAttendance.absent
-              }
+              value={stats.todayAttendance.absent}
               type="absent"
             />
 
             <AttendanceItem
               label="Late"
-              value={
-                stats.todayAttendance.late
-              }
+              value={stats.todayAttendance.late}
               type="late"
             />
 
             <AttendanceItem
               label="Half Day"
-              value={
-                stats.todayAttendance.halfDay
-              }
+              value={stats.todayAttendance.halfDay}
               type="half"
             />
           </div>
@@ -786,9 +813,7 @@ export default function AdminDashboard() {
 
           <div className="h-[300px]">
             <AttendanceTrendChart
-              data={
-                charts?.attendanceTrend
-              }
+              data={charts?.attendanceTrend}
               loading={chartsLoading}
             />
           </div>
@@ -870,135 +895,88 @@ export default function AdminDashboard() {
           />
 
           <div className="space-y-2">
-
             {activityLoading ? (
               Array(4)
                 .fill(0)
                 .map((_, i) => (
-                  <div
-                    key={i}
-                    className="
-                      flex
-                      items-center
-                      gap-3
-                      p-3
-                      rounded-xl
-                      animate-pulse
-                    "
-                  >
-                    <div
-                      className="
-                        w-10
-                        h-10
-                        rounded-full
-                        bg-slate-200
-                        dark:bg-white/10
-                      "
-                    />
-
-                    <div
-                      className="
-                        flex-1
-                        space-y-2
-                      "
-                    >
-                      <div
-                        className="
-                          h-3
-                          bg-slate-200
-                          dark:bg-white/10
-                          rounded
-                          w-32
-                        "
-                      />
-
-                      <div
-                        className="
-                          h-2.5
-                          bg-slate-200
-                          dark:bg-white/10
-                          rounded
-                          w-24
-                        "
-                      />
-                    </div>
-                  </div>
+                  <ActivitySkeleton key={i} />
                 ))
-            ) : (
-              activity?.recentHires?.map(
-                (emp) => (
+            ) : activity?.recentHires?.length > 0 ? (
+              activity.recentHires.map((emp) => (
+                <div
+                  key={emp._id}
+                  className="
+                    flex
+                    items-center
+                    gap-3
+                    p-3
+                    rounded-xl
+                    hover:bg-slate-50
+                    dark:hover:bg-white/[0.03]
+                    transition-colors
+                  "
+                >
+                  <Avatar
+                    src={emp.profileImage}
+                    name={emp.firstName}
+                    size="md"
+                  />
+
                   <div
-                    key={emp._id}
                     className="
-                      flex
-                      items-center
-                      gap-3
-                      p-3
-                      rounded-xl
-                      hover:bg-slate-50
-                      dark:hover:bg-white/[0.03]
-                      transition-colors
+                      flex-1
+                      min-w-0
                     "
                   >
-                    <Avatar
-                      src={
-                        emp.profileImage
-                      }
-                      name={
-                        emp.firstName
-                      }
-                      size="md"
-                    />
-
-                    <div
+                    <p
                       className="
-                        flex-1
-                        min-w-0
+                        text-sm
+                        font-semibold
+                        text-slate-800
+                        dark:text-white
+                        truncate
                       "
                     >
-                      <p
-                        className="
-                          text-sm
-                          font-semibold
-                          text-slate-800
-                          dark:text-white
-                          truncate
-                        "
-                      >
-                        {emp.firstName}{' '}
-                        {emp.lastName}
-                      </p>
-
-                      <p
-                        className="
-                          text-xs
-                          text-slate-400
-                          truncate
-                          mt-0.5
-                        "
-                      >
-                        {emp.designation}
-                        {' · '}
-                        {emp.department?.name}
-                      </p>
-                    </div>
+                      {emp.firstName} {emp.lastName}
+                    </p>
 
                     <p
                       className="
-                        text-[11px]
+                        text-xs
                         text-slate-400
-                        flex-shrink-0
+                        truncate
+                        mt-0.5
                       "
                     >
-                      {formatDate(
-                        emp.createdAt
-                      )}
+                      {emp.designation}
+                      {' · '}
+                      {emp.department?.name || 'No department'}
                     </p>
                   </div>
-                )
-              )
-            )}
 
+                  <p
+                    className="
+                      text-[11px]
+                      text-slate-400
+                      flex-shrink-0
+                    "
+                  >
+                    {formatDate(emp.createdAt)}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <div
+                className="
+                  py-8
+                  text-center
+                  text-sm
+                  text-slate-400
+                "
+              >
+                No recent hires
+              </div>
+            )}
           </div>
         </motion.div>
 
@@ -1030,147 +1008,84 @@ export default function AdminDashboard() {
           />
 
           <div className="space-y-2">
-
             {activityLoading ? (
               Array(4)
                 .fill(0)
                 .map((_, i) => (
-                  <div
+                  <ActivitySkeleton
                     key={i}
-                    className="
-                      flex
-                      items-center
-                      gap-3
-                      p-3
-                      rounded-xl
-                      animate-pulse
-                    "
-                  >
-                    <div
-                      className="
-                        w-10
-                        h-10
-                        rounded-full
-                        bg-slate-200
-                        dark:bg-white/10
-                      "
-                    />
-
-                    <div
-                      className="
-                        flex-1
-                        space-y-2
-                      "
-                    >
-                      <div
-                        className="
-                          h-3
-                          bg-slate-200
-                          dark:bg-white/10
-                          rounded
-                          w-32
-                        "
-                      />
-
-                      <div
-                        className="
-                          h-2.5
-                          bg-slate-200
-                          dark:bg-white/10
-                          rounded
-                          w-24
-                        "
-                      />
-                    </div>
-
-                    <div
-                      className="
-                        w-14
-                        h-5
-                        rounded-full
-                        bg-slate-200
-                        dark:bg-white/10
-                      "
-                    />
-                  </div>
+                    badge
+                  />
                 ))
-            ) : (
-              activity?.recentLeaves?.map(
-                (leave) => (
+            ) : activity?.recentLeaves?.length > 0 ? (
+              activity.recentLeaves.map((leave) => (
+                <div
+                  key={leave._id}
+                  className="
+                    flex
+                    items-center
+                    gap-3
+                    p-3
+                    rounded-xl
+                    hover:bg-slate-50
+                    dark:hover:bg-white/[0.03]
+                    transition-colors
+                  "
+                >
+                  <Avatar
+                    src={leave.employee?.profileImage}
+                    name={leave.employee?.firstName}
+                    size="md"
+                  />
+
                   <div
-                    key={leave._id}
                     className="
-                      flex
-                      items-center
-                      gap-3
-                      p-3
-                      rounded-xl
-                      hover:bg-slate-50
-                      dark:hover:bg-white/[0.03]
-                      transition-colors
+                      flex-1
+                      min-w-0
                     "
                   >
-                    <Avatar
-                      src={
-                        leave.employee
-                          ?.profileImage
-                      }
-                      name={
-                        leave.employee
-                          ?.firstName
-                      }
-                      size="md"
-                    />
-
-                    <div
+                    <p
                       className="
-                        flex-1
-                        min-w-0
+                        text-sm
+                        font-semibold
+                        text-slate-800
+                        dark:text-white
+                        truncate
                       "
                     >
-                      <p
-                        className="
-                          text-sm
-                          font-semibold
-                          text-slate-800
-                          dark:text-white
-                          truncate
-                        "
-                      >
-                        {
-                          leave.employee
-                            ?.firstName
-                        }{' '}
-                        {
-                          leave.employee
-                            ?.lastName
-                        }
-                      </p>
+                      {leave.employee?.firstName}{' '}
+                      {leave.employee?.lastName}
+                    </p>
 
-                      <p
-                        className="
-                          text-xs
-                          text-slate-400
-                          mt-0.5
-                        "
-                      >
-                        {leave.leaveType}
-                        {' · '}
-                        {leave.totalDays}
-                        {' day(s)'}
-                      </p>
-                    </div>
-
-                    <Badge
-                      status={
-                        leave.status
-                      }
-                    />
+                    <p
+                      className="
+                        text-xs
+                        text-slate-400
+                        mt-0.5
+                      "
+                    >
+                      {leave.leaveType}
+                      {' · '}
+                      {leave.totalDays}
+                      {' day(s)'}
+                    </p>
                   </div>
-                )
-              )
-            )}
 
+                  <Badge status={leave.status} />
+                </div>
+              ))
+            ) : (
+              <div
+                className="
+                  py-8
+                  text-center
+                  text-sm
+                  text-slate-400
+                "
+              >
+                No recent leave requests
+              </div>
+            )}
           </div>
         </motion.div>
       </div>
@@ -1212,6 +1127,9 @@ export default function AdminDashboard() {
             gap-3
           "
         >
+
+          {/* Add Employee */}
+
           <Link
             to="/admin/employees/add"
             className="
@@ -1247,9 +1165,7 @@ export default function AdminDashboard() {
                 transition-transform
               "
             >
-              <HiOutlinePlus
-                size={19}
-              />
+              <HiOutlinePlus size={19} />
             </div>
 
             <div>
@@ -1276,6 +1192,8 @@ export default function AdminDashboard() {
             </div>
           </Link>
 
+
+          {/* Manage Employees */}
 
           <Link
             to="/admin/employees"
@@ -1312,9 +1230,7 @@ export default function AdminDashboard() {
                 transition-transform
               "
             >
-              <HiOutlineUsers
-                size={19}
-              />
+              <HiOutlineUsers size={19} />
             </div>
 
             <div>
@@ -1341,6 +1257,8 @@ export default function AdminDashboard() {
             </div>
           </Link>
 
+
+          {/* Attendance */}
 
           <Link
             to="/admin/attendance"
@@ -1377,9 +1295,7 @@ export default function AdminDashboard() {
                 transition-transform
               "
             >
-              <HiOutlineCalendar
-                size={19}
-              />
+              <HiOutlineCalendar size={19} />
             </div>
 
             <div>
@@ -1406,6 +1322,8 @@ export default function AdminDashboard() {
             </div>
           </Link>
 
+
+          {/* Leave Requests */}
 
           <Link
             to="/admin/leaves"
@@ -1442,9 +1360,7 @@ export default function AdminDashboard() {
                 transition-transform
               "
             >
-              <HiOutlineClipboardList
-                size={19}
-              />
+              <HiOutlineClipboardList size={19} />
             </div>
 
             <div>

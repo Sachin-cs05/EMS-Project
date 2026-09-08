@@ -2,32 +2,86 @@ import mongoose from 'mongoose';
 
 const attendanceSchema = new mongoose.Schema(
   {
-    employee:  { type: mongoose.Schema.Types.ObjectId, ref: 'Employee', required: true },
-    date:      { type: Date, required: true },
-    checkIn:   { type: Date, default: null },
-    checkOut:  { type: Date, default: null },
+    employee: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Employee',
+      required: true,
+      index: true,
+    },
+
+    date: {
+      type: Date,
+      required: true,
+      index: true,
+    },
+
+    checkIn: {
+      type: Date,
+      default: null,
+    },
+
+    checkOut: {
+      type: Date,
+      default: null,
+    },
+
     status: {
-      type:    String,
-      enum:    ['present', 'absent', 'late', 'half_day', 'holiday'],
+      type: String,
+      enum: [
+        'present',
+        'absent',
+        'late',
+        'half_day',
+        'holiday',
+      ],
       default: 'absent',
     },
-    workHours: { type: Number, default: 0 },
-    note:      { type: String, default: '' },
-    markedBy:  { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+
+    workHours: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
+    note: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+
+    markedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
+    },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
-attendanceSchema.index({ employee: 1, date: 1 }, { unique: true });
+// One attendance record per employee per day
+attendanceSchema.index(
+  { employee: 1, date: 1 },
+  { unique: true }
+);
 
+// Calculate work hours automatically
 attendanceSchema.pre('save', function (next) {
   if (this.checkIn && this.checkOut) {
-    const diff = (this.checkOut - this.checkIn) / (1000 * 60 * 60);
+    const diff =
+      (this.checkOut.getTime() - this.checkIn.getTime()) /
+      (1000 * 60 * 60);
+
+    if (diff < 0) {
+      return next(
+        new Error('Check-out time cannot be before check-in time')
+      );
+    }
+
     this.workHours = Math.round(diff * 100) / 100;
-    if (diff >= 8)       this.status = 'present';
-    else if (diff >= 4)  this.status = 'half_day';
-    else                 this.status = 'late';
   }
+
   next();
 });
 

@@ -16,24 +16,51 @@ export default function EmployeeList() {
   const { list: employees, pagination, loading } = useSelector((s) => s.employees);
   const { list: departments } = useSelector((s) => s.departments);
 
-  const [page,       setPage]       = useState(1);
-  const [search,     setSearch]     = useState('');
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [department, setDepartment] = useState('');
-  const [status,     setStatus]     = useState('');
-  const [deleteId,   setDeleteId]   = useState(null);
-  const [deleting,   setDeleting]   = useState(false);
+  const [status, setStatus] = useState('');
+
+  const [sortBy, setSortBy] = useState('createdAt');
+  const [order, setOrder] = useState('desc');
+  const [deleteId, setDeleteId] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const load = useCallback(() => {
-    dispatch(fetchEmployees({ page, limit: 10, search, department, status }));
-  }, [page, search, department, status]);
+      dispatch(
+        fetchEmployees({
+          page,
+          limit: 10,
+          search: debouncedSearch,
+          department,
+          status,
+          sortBy,
+          order,
+        })
+      );
+    }, [
+      dispatch,
+      page,
+      debouncedSearch,
+      department,
+      status,
+      sortBy,
+      order,
+    ]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {load();}, [load]);
   useEffect(() => { dispatch(fetchDepartments()); }, []);
 
   // Debounced search
+  // Debounced search
   useEffect(() => {
-    const t = setTimeout(() => { setPage(1); load(); }, 400);
-    return () => clearTimeout(t);
+      const timer = setTimeout(() => {
+        setDebouncedSearch(search);
+        setPage(1);
+      }, 400);
+
+      return () => clearTimeout(timer);
   }, [search]);
 
   const handleDelete = async () => {
@@ -92,6 +119,26 @@ export default function EmployeeList() {
           <option value="">All Departments</option>
           {departments.map((d) => <option key={d._id} value={d._id}>{d.name}</option>)}
         </select>
+        <select
+          value={`${sortBy}-${order}`}
+          onChange={(e) => {
+            const [newSortBy, newOrder] = e.target.value.split('-');
+            setSortBy(newSortBy);
+            setOrder(newOrder);
+            setPage(1);
+          }}
+          className="select w-full sm:w-48"
+        >
+          <option value="createdAt-desc">Newest First</option>
+          <option value="createdAt-asc">Oldest First</option>
+          <option value="firstName-asc">Name A-Z</option>
+          <option value="firstName-desc">Name Z-A</option>
+          <option value="salary-desc">Salary High-Low</option>
+          <option value="salary-asc">Salary Low-High</option>
+          <option value="joiningDate-desc">Recently Joined</option>
+          <option value="joiningDate-asc">Oldest Joined</option>
+        </select>
+
         <select value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }} className="select w-full sm:w-36">
           <option value="">All Status</option>
           <option value="active">Active</option>
@@ -99,9 +146,19 @@ export default function EmployeeList() {
           <option value="on_leave">On Leave</option>
           <option value="terminated">Terminated</option>
         </select>
-        {(search || department || status) && (
-          <button onClick={() => { setSearch(''); setDepartment(''); setStatus(''); setPage(1); }}
-            className="btn-ghost text-gray-500">
+        {(search || department || status || sortBy !== 'createdAt' || order !== 'desc') && (
+          <button
+            onClick={() => {
+              setSearch('');
+              setDebouncedSearch('');
+              setDepartment('');
+              setStatus('');
+              setSortBy('createdAt');
+              setOrder('desc');
+              setPage(1);
+            }}
+            className="btn-ghost text-gray-500"
+          >
             Clear filters
           </button>
         )}

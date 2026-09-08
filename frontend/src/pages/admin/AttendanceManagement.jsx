@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { HiOutlineCalendar, HiOutlineSearch, HiOutlineFilter } from 'react-icons/hi';
-import { fetchAllAttendance, fetchDepartments } from '../../features/slices';
+import { fetchAllAttendance, fetchDepartments, fetchEmployees } from '../../features/slices';
 import { markAttendanceApi } from '../../api/index.js';
 import { showToast } from '../../features/slices';
 import { Badge, Avatar, EmptyState, SkeletonTable, Modal } from '../../components/common/index.jsx';
@@ -23,6 +23,7 @@ export default function AttendanceManagement() {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
 
   useEffect(() => { dispatch(fetchDepartments()); }, []);
+  useEffect(() => { dispatch(fetchEmployees({ limit: 100 })); }, []);
   useEffect(() => { dispatch(fetchAllAttendance({ date, department })); }, [date, department]);
 
   const onMarkAttendance = async (data) => {
