@@ -7,10 +7,12 @@
 @layer base {
   * { @apply border-gray-200 dark:border-white/10; }
   body {
-    @apply bg-gray-50 text-gray-900 font-sans antialiased;
+    @apply bg-slate-50 text-slate-900 font-sans antialiased;
+    background-color: #f8fafc;
   }
   .dark body {
-    @apply bg-[#0f0f13] text-gray-100;
+    @apply bg-[#0c0e12] text-gray-100;
+    background-color: #0c0e12;
   }
 }
 
@@ -127,8 +129,8 @@
 
   /* ── Card ── */
   .card {
-    @apply rounded-2xl bg-white border border-gray-100 shadow-card
-           dark:bg-[#1a1a2e] dark:border-white/10;
+    @apply rounded-2xl bg-white border border-slate-200/80 shadow-card
+           dark:bg-[#15171d] dark:border-white/[0.06];
   }
 
   /* ── Scrollbar ── */
@@ -143,5 +145,224 @@
   }
   .skeleton {
     @apply animate-pulse bg-gray-200 dark:bg-white/10 rounded-lg;
+  }
+}
+
+/* =========================================================
+   MODERN SAAS UI
+   ========================================================= */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+}
+
+/* Smooth scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
+/* Better selection */
+::selection {
+  background: rgba(99, 102, 241, 0.18);
+  color: #4338ca;
+}
+
+/* SaaS page heading */
+.page-title {
+  @apply text-2xl md:text-3xl font-bold tracking-tight
+    text-slate-900 dark:text-white;
+}
+
+.page-description {
+  @apply mt-1 text-sm text-slate-500 dark:text-slate-400;
+}
+
+/* Modern SaaS card */
+.saas-card {
+  @apply bg-white
+    dark:bg-[#15171d]
+    border
+    border-slate-200/80
+    dark:border-white/[0.06]
+    rounded-2xl
+    shadow-[0_1px_3px_rgba(15,23,42,0.04)]
+    transition-all
+    duration-200;
+}
+
+.saas-card:hover {
+  @apply shadow-[0_8px_30px_rgba(15,23,42,0.06)];
+}
+
+.dark .saas-card:hover {
+  @apply shadow-none;
+}
+
+/* Modern stat card */
+.saas-stat {
+  @apply bg-white
+    dark:bg-[#15171d]
+    border
+    border-slate-200/80
+    dark:border-white/[0.06]
+    rounded-2xl
+    p-5
+    transition-all
+    duration-200;
+}
+
+.saas-stat:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+.dark .saas-stat:hover {
+  box-shadow: none;
+}
+
+/* Section title */
+.section-title {
+  @apply text-sm
+    font-semibold
+    text-slate-900
+    dark:text-white;
+}
+
+.section-description {
+  @apply text-xs
+    text-slate-400
+    mt-1;
+}
+
+/* Modern divider */
+.saas-divider {
+  @apply border-slate-100
+    dark:border-white/[0.06];
+}
+
+/* Modern input */
+.saas-input {
+  @apply w-full
+    h-11
+    px-3.5
+    rounded-xl
+    border
+    border-slate-200
+    dark:border-white/[0.08]
+    bg-white
+    dark:bg-[#15171d]
+    text-sm
+    text-slate-900
+    dark:text-white
+    placeholder:text-slate-400
+    outline-none
+    transition-all;
+}
+
+.saas-input:focus {
+  @apply border-indigo-400
+    ring-4
+    ring-indigo-500/10;
+}
+
+/* Modern primary button */
+.saas-btn-primary {
+  @apply inline-flex
+    items-center
+    justify-center
+    gap-2
+    h-10
+    px-4
+    rounded-xl
+    bg-indigo-600
+    hover:bg-indigo-700
+    text-white
+    text-sm
+    font-semibold
+    shadow-sm
+    shadow-indigo-500/20
+    transition-all
+    duration-200
+    active:scale-[0.98];
+}
+
+/* Secondary button */
+.saas-btn-secondary {
+  @apply inline-flex
+    items-center
+    justify-center
+    gap-2
+    h-10
+    px-4
+    rounded-xl
+    bg-white
+    dark:bg-[#15171d]
+    border
+    border-slate-200
+    dark:border-white/[0.08]
+    text-slate-700
+    dark:text-slate-200
+    text-sm
+    font-medium
+    hover:bg-slate-50
+    dark:hover:bg-white/[0.04]
+    transition-all;
+}
+
+/* Badge */
+.saas-badge {
+  @apply inline-flex
+    items-center
+    gap-1.5
+    px-2.5
+    py-1
+    rounded-lg
+    text-[11px]
+    font-semibold;
+}
+
+/* Page entrance */
+@keyframes saas-page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.saas-page-enter {
+  animation: saas-page-enter 0.35s ease-out;
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .page-title {
+    @apply text-xl;
   }
 }

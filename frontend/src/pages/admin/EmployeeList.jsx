@@ -49,33 +49,50 @@ export default function EmployeeList() {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6 saas-page-enter">
       {/* Header */}
-      <div className="page-header">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="page-title">Employees</h1>
-          <p className="page-subtitle">{pagination?.total || 0} total employees</p>
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[10px] font-semibold mb-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" /> Workspace
+          </div>
+          <h1 className="page-title">Employee Directory</h1>
+          <p className="page-description">Manage your organization's employees.</p>
         </div>
-        <Link to="/admin/employees/add" className="btn-primary">
+        <Link to="/admin/employees/add" className="saas-btn-primary self-start sm:self-auto">
           <HiOutlinePlus size={16} /> Add Employee
         </Link>
       </div>
 
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {[
+          ['Total Employees', pagination?.total || 0, 'All records'],
+          ['Showing', employees.length, 'Current filters'],
+          ['Current Page', page, `of ${pagination?.totalPages || 1}`],
+        ].map(([label, value, note]) => (
+          <div key={label} className="saas-stat">
+            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{label}</p>
+            <p className="mt-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">{value}</p>
+            <p className="mt-1 text-[11px] text-slate-400">{note}</p>
+          </div>
+        ))}
+      </div>
+
       {/* Filters */}
-      <div className="card p-4 flex flex-wrap gap-3">
+      <div className="saas-card p-4 flex flex-wrap gap-3 items-center">
         <div className="relative flex-1 min-w-[180px]">
           <HiOutlineSearch size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text" value={search} onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name, ID, designation…"
-            className="input pl-9"
+            className="saas-input pl-9"
           />
         </div>
-        <select value={department} onChange={(e) => { setDepartment(e.target.value); setPage(1); }} className="select w-44">
+        <select value={department} onChange={(e) => { setDepartment(e.target.value); setPage(1); }} className="select w-full sm:w-44">
           <option value="">All Departments</option>
           {departments.map((d) => <option key={d._id} value={d._id}>{d.name}</option>)}
         </select>
-        <select value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }} className="select w-36">
+        <select value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }} className="select w-full sm:w-36">
           <option value="">All Status</option>
           <option value="active">Active</option>
           <option value="inactive">Inactive</option>

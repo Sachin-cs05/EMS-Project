@@ -1,228 +1,1479 @@
-import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+
 import {
-  HiOutlineUsers, HiOutlineOfficeBuilding, HiOutlineUserGroup,
-  HiOutlineClipboardList, HiOutlinePlus, HiOutlineArrowRight,
+  HiOutlineUsers,
+  HiOutlineOfficeBuilding,
+  HiOutlineUserGroup,
+  HiOutlineClipboardList,
+  HiOutlinePlus,
+  HiOutlineArrowRight,
+  HiOutlineCalendar,
+  HiOutlineClock,
+  HiOutlineCheckCircle,
+  HiOutlineExclamationCircle,
 } from 'react-icons/hi';
+
 import { useDashboard } from '../../hooks/useDashboard';
-import { SkeletonCard } from '../../components/common/index.jsx';
-import { Badge, Avatar } from '../../components/common/index.jsx';
+
+import {
+  SkeletonCard,
+  Badge,
+  Avatar,
+} from '../../components/common/index.jsx';
+
 import { formatDate } from '../../components/common/timeUtils';
-import DepartmentPieChart    from '../../components/charts/DepartmentPieChart';
-import AttendanceTrendChart  from '../../components/charts/AttendanceTrendChart';
-import EmployeeGrowthChart   from '../../components/charts/EmployeeGrowthChart';
-import LeaveStatsChart       from '../../components/charts/LeaveStatsChart';
+
+import DepartmentPieChart from '../../components/charts/DepartmentPieChart';
+import AttendanceTrendChart from '../../components/charts/AttendanceTrendChart';
+import EmployeeGrowthChart from '../../components/charts/EmployeeGrowthChart';
+import LeaveStatsChart from '../../components/charts/LeaveStatsChart';
+
+
+/* =========================================================
+   ANIMATION
+========================================================= */
 
 const cardVariants = {
-  hidden:  { opacity: 0, y: 16 },
-  visible: (i) => ({ opacity: 1, y: 0, transition: { delay: i * 0.08, duration: 0.4 } }),
+  hidden: {
+    opacity: 0,
+    y: 15,
+  },
+
+  visible: (i) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.07,
+      duration: 0.35,
+      ease: 'easeOut',
+    },
+  }),
 };
 
-function StatCard({ title, value, subtitle, icon: Icon, color, loading, index }) {
-  const colorMap = {
-    blue:   'from-blue-500   to-blue-600',
-    green:  'from-emerald-500 to-emerald-600',
-    purple: 'from-purple-500 to-purple-600',
-    amber:  'from-amber-500  to-amber-600',
-  };
-  const bgMap = {
-    blue:   'bg-blue-50   dark:bg-blue-500/10',
-    green:  'bg-emerald-50 dark:bg-emerald-500/10',
-    purple: 'bg-purple-50 dark:bg-purple-500/10',
-    amber:  'bg-amber-50  dark:bg-amber-500/10',
-  };
-  const textMap = {
-    blue:   'text-blue-600   dark:text-blue-400',
-    green:  'text-emerald-600 dark:text-emerald-400',
-    purple: 'text-purple-600 dark:text-purple-400',
-    amber:  'text-amber-600  dark:text-amber-400',
+
+/* =========================================================
+   STAT CARD
+========================================================= */
+
+function StatCard({
+  title,
+  value,
+  subtitle,
+  icon: Icon,
+  color,
+  loading,
+  index,
+}) {
+  const styles = {
+    blue: {
+      iconBg:
+        'bg-indigo-50 dark:bg-indigo-500/10',
+      icon:
+        'text-indigo-600 dark:text-indigo-400',
+      glow:
+        'group-hover:shadow-indigo-500/10',
+    },
+
+    green: {
+      iconBg:
+        'bg-emerald-50 dark:bg-emerald-500/10',
+      icon:
+        'text-emerald-600 dark:text-emerald-400',
+      glow:
+        'group-hover:shadow-emerald-500/10',
+    },
+
+    purple: {
+      iconBg:
+        'bg-violet-50 dark:bg-violet-500/10',
+      icon:
+        'text-violet-600 dark:text-violet-400',
+      glow:
+        'group-hover:shadow-violet-500/10',
+    },
+
+    amber: {
+      iconBg:
+        'bg-amber-50 dark:bg-amber-500/10',
+      icon:
+        'text-amber-600 dark:text-amber-400',
+      glow:
+        'group-hover:shadow-amber-500/10',
+    },
   };
 
-  if (loading) return <SkeletonCard />;
+  const style = styles[color];
+
+  if (loading) {
+    return <SkeletonCard />;
+  }
 
   return (
-    <motion.div custom={index} variants={cardVariants} initial="hidden" animate="visible"
-      className="stat-card group cursor-default">
-      <div className="flex items-start justify-between">
-        <div className={`w-11 h-11 rounded-2xl ${bgMap[color]} flex items-center justify-center transition-transform group-hover:scale-110`}>
-          <Icon size={20} className={textMap[color]} />
+    <motion.div
+      custom={index}
+      variants={cardVariants}
+      initial="hidden"
+      animate="visible"
+      className={`
+        group
+        relative
+        overflow-hidden
+        bg-white
+        dark:bg-[#15171d]
+        border
+        border-slate-200/80
+        dark:border-white/[0.06]
+        rounded-2xl
+        p-5
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:shadow-xl
+        ${style.glow}
+      `}
+    >
+      {/* Decorative glow */}
+      <div
+        className="
+          absolute
+          -right-8
+          -top-8
+          w-24
+          h-24
+          rounded-full
+          bg-indigo-500/[0.03]
+          dark:bg-indigo-400/[0.04]
+          blur-2xl
+          transition-all
+          duration-300
+          group-hover:scale-150
+        "
+      />
+
+      <div className="relative">
+        {/* Top */}
+        <div className="flex items-center justify-between">
+          <div
+            className={`
+              w-11
+              h-11
+              rounded-xl
+              flex
+              items-center
+              justify-center
+              ${style.iconBg}
+              transition-transform
+              duration-300
+              group-hover:scale-110
+            `}
+          >
+            <Icon
+              size={21}
+              className={style.icon}
+            />
+          </div>
+
+          <span
+            className="
+              inline-flex
+              items-center
+              gap-1.5
+              px-2
+              py-1
+              rounded-lg
+              bg-emerald-50
+              dark:bg-emerald-500/10
+              text-emerald-600
+              dark:text-emerald-400
+              text-[10px]
+              font-semibold
+            "
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            Live
+          </span>
         </div>
-        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${bgMap[color]} ${textMap[color]}`}>
-          Live
-        </span>
-      </div>
-      <div className="mt-4">
-        <p className="text-3xl font-black text-gray-900 dark:text-white">{value ?? '—'}</p>
-        <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mt-0.5">{title}</p>
-        {subtitle && <p className="text-xs text-gray-400 mt-1">{subtitle}</p>}
+
+        {/* Content */}
+        <div className="mt-5">
+          <p
+            className="
+              text-3xl
+              font-bold
+              tracking-tight
+              text-slate-900
+              dark:text-white
+            "
+          >
+            {value ?? '—'}
+          </p>
+
+          <p
+            className="
+              mt-1
+              text-sm
+              font-semibold
+              text-slate-700
+              dark:text-slate-200
+            "
+          >
+            {title}
+          </p>
+
+          <p
+            className="
+              mt-1
+              text-xs
+              text-slate-400
+            "
+          >
+            {subtitle}
+          </p>
+        </div>
       </div>
     </motion.div>
   );
 }
 
+
+/* =========================================================
+   ATTENDANCE ITEM
+========================================================= */
+
+function AttendanceItem({
+  label,
+  value,
+  type,
+}) {
+  const config = {
+    present: {
+      dot: 'bg-emerald-500',
+      bg: 'bg-emerald-50 dark:bg-emerald-500/[0.07]',
+      icon: HiOutlineCheckCircle,
+      iconColor:
+        'text-emerald-500',
+    },
+
+    absent: {
+      dot: 'bg-red-500',
+      bg: 'bg-red-50 dark:bg-red-500/[0.07]',
+      icon: HiOutlineExclamationCircle,
+      iconColor:
+        'text-red-500',
+    },
+
+    late: {
+      dot: 'bg-amber-500',
+      bg: 'bg-amber-50 dark:bg-amber-500/[0.07]',
+      icon: HiOutlineClock,
+      iconColor:
+        'text-amber-500',
+    },
+
+    half: {
+      dot: 'bg-indigo-500',
+      bg: 'bg-indigo-50 dark:bg-indigo-500/[0.07]',
+      icon: HiOutlineCalendar,
+      iconColor:
+        'text-indigo-500',
+    },
+  };
+
+  const item = config[type];
+  const Icon = item.icon;
+
+  return (
+    <div
+      className={`
+        ${item.bg}
+        rounded-xl
+        px-4
+        py-3
+        flex
+        items-center
+        justify-between
+        transition-all
+        duration-200
+        hover:scale-[1.01]
+      `}
+    >
+      <div className="flex items-center gap-3">
+        <div
+          className="
+            w-8
+            h-8
+            rounded-lg
+            bg-white/70
+            dark:bg-white/[0.04]
+            flex
+            items-center
+            justify-center
+          "
+        >
+          <Icon
+            size={16}
+            className={item.iconColor}
+          />
+        </div>
+
+        <div>
+          <p
+            className="
+              text-xs
+              font-medium
+              text-slate-500
+              dark:text-slate-400
+            "
+          >
+            {label}
+          </p>
+        </div>
+      </div>
+
+      <p
+        className="
+          text-lg
+          font-bold
+          text-slate-900
+          dark:text-white
+        "
+      >
+        {value}
+      </p>
+    </div>
+  );
+}
+
+
+/* =========================================================
+   SECTION HEADER
+========================================================= */
+
+function SectionHeader({
+  title,
+  subtitle,
+  link,
+  linkText = 'View all',
+}) {
+  return (
+    <div
+      className="
+        flex
+        items-center
+        justify-between
+        mb-5
+      "
+    >
+      <div>
+        <h2
+          className="
+            text-sm
+            font-bold
+            text-slate-900
+            dark:text-white
+          "
+        >
+          {title}
+        </h2>
+
+        {subtitle && (
+          <p
+            className="
+              mt-1
+              text-xs
+              text-slate-400
+            "
+          >
+            {subtitle}
+          </p>
+        )}
+      </div>
+
+      {link && (
+        <Link
+          to={link}
+          className="
+            flex
+            items-center
+            gap-1
+            text-xs
+            font-semibold
+            text-indigo-600
+            dark:text-indigo-400
+            hover:text-indigo-700
+            dark:hover:text-indigo-300
+            transition-colors
+          "
+        >
+          {linkText}
+
+          <HiOutlineArrowRight
+            size={13}
+          />
+        </Link>
+      )}
+    </div>
+  );
+}
+
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
 export default function AdminDashboard() {
-  const { stats, charts, activity, statsLoading, chartsLoading, activityLoading } = useDashboard();
+  const {
+    stats,
+    charts,
+    activity,
+    statsLoading,
+    chartsLoading,
+    activityLoading,
+  } = useDashboard();
 
   const statCards = [
-    { title: 'Total Employees',   value: stats?.totalEmployees,   subtitle: 'All time',          icon: HiOutlineUsers,          color: 'blue'   },
-    { title: 'Active Employees',  value: stats?.activeEmployees,  subtitle: 'Currently working', icon: HiOutlineUserGroup,      color: 'green'  },
-    { title: 'Departments',       value: stats?.totalDepartments, subtitle: 'Active teams',      icon: HiOutlineOfficeBuilding, color: 'purple' },
-    { title: 'Pending Leaves',    value: stats?.pendingLeaves,    subtitle: 'Needs review',      icon: HiOutlineClipboardList,  color: 'amber'  },
+    {
+      title: 'Total Employees',
+      value: stats?.totalEmployees,
+      subtitle: 'All employees in organization',
+      icon: HiOutlineUsers,
+      color: 'blue',
+    },
+
+    {
+      title: 'Active Employees',
+      value: stats?.activeEmployees,
+      subtitle: 'Currently working',
+      icon: HiOutlineUserGroup,
+      color: 'green',
+    },
+
+    {
+      title: 'Departments',
+      value: stats?.totalDepartments,
+      subtitle: 'Active teams',
+      icon: HiOutlineOfficeBuilding,
+      color: 'purple',
+    },
+
+    {
+      title: 'Pending Leaves',
+      value: stats?.pendingLeaves,
+      subtitle: 'Requests waiting for review',
+      icon: HiOutlineClipboardList,
+      color: 'amber',
+    },
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="page-header">
+    <div className="space-y-7 saas-page-enter">
+
+      {/* =====================================================
+          HEADER
+      ===================================================== */}
+
+      <motion.div
+        initial={{
+          opacity: 0,
+          y: 10,
+        }}
+        animate={{
+          opacity: 1,
+          y: 0,
+        }}
+        className="
+          flex
+          flex-col
+          gap-4
+          sm:flex-row
+          sm:items-center
+          sm:justify-between
+        "
+      >
         <div>
-          <h1 className="page-title">Dashboard</h1>
-          <p className="page-subtitle">Welcome back! Here's what's happening today.</p>
+          <div
+            className="
+              inline-flex
+              items-center
+              gap-2
+              px-2.5
+              py-1
+              rounded-lg
+              bg-indigo-50
+              dark:bg-indigo-500/10
+              text-indigo-600
+              dark:text-indigo-400
+              text-[10px]
+              font-semibold
+              mb-2
+            "
+          >
+            <span
+              className="
+                w-1.5
+                h-1.5
+                rounded-full
+                bg-indigo-500
+              "
+            />
+
+            Admin Workspace
+          </div>
+
+          <h1
+            className="
+              text-2xl
+              md:text-3xl
+              font-bold
+              tracking-tight
+              text-slate-900
+              dark:text-white
+            "
+          >
+            Dashboard
+          </h1>
+
+          <p
+            className="
+              mt-1
+              text-sm
+              text-slate-500
+              dark:text-slate-400
+            "
+          >
+            Welcome back! Here's what's happening
+            in your organization today.
+          </p>
         </div>
-        <Link to="/admin/employees/add" className="btn-primary">
-          <HiOutlinePlus size={16} /> Add Employee
+
+        <Link
+          to="/admin/employees/add"
+          className="
+            saas-btn-primary
+            self-start
+            sm:self-auto
+          "
+        >
+          <HiOutlinePlus
+            size={17}
+          />
+
+          Add Employee
         </Link>
+      </motion.div>
+
+
+      {/* =====================================================
+          STAT CARDS
+      ===================================================== */}
+
+      <div
+        className="
+          grid
+          grid-cols-1
+          sm:grid-cols-2
+          xl:grid-cols-4
+          gap-4
+        "
+      >
+        {statCards.map(
+          (card, index) => (
+            <StatCard
+              key={card.title}
+              {...card}
+              loading={statsLoading}
+              index={index}
+            />
+          )
+        )}
       </div>
 
-      {/* Stat cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        {statCards.map((c, i) => (
-          <StatCard key={c.title} {...c} loading={statsLoading} index={i} />
-        ))}
-      </div>
 
-      {/* Attendance quick summary */}
+      {/* =====================================================
+          ATTENDANCE
+      ===================================================== */}
+
       {stats?.todayAttendance && (
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
-          className="card p-5">
-          <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">
-            Today's Attendance Summary
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { label: 'Present',  value: stats.todayAttendance.present,  color: 'bg-green-500'  },
-              { label: 'Absent',   value: stats.todayAttendance.absent,   color: 'bg-red-500'    },
-              { label: 'Late',     value: stats.todayAttendance.late,     color: 'bg-yellow-500' },
-              { label: 'Half Day', value: stats.todayAttendance.halfDay,  color: 'bg-blue-500'   },
-            ].map(({ label, value, color }) => (
-              <div key={label} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-white/5">
-                <div className={`w-2.5 h-2.5 rounded-full ${color} flex-shrink-0`} />
-                <div>
-                  <p className="text-xl font-black text-gray-900 dark:text-white">{value}</p>
-                  <p className="text-xs text-gray-500">{label}</p>
-                </div>
-              </div>
-            ))}
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: 12,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            delay: 0.3,
+          }}
+          className="
+            saas-card
+            p-5
+            md:p-6
+          "
+        >
+          <SectionHeader
+            title="Today's Attendance"
+            subtitle="Real-time attendance overview"
+          />
+
+          <div
+            className="
+              grid
+              grid-cols-2
+              lg:grid-cols-4
+              gap-3
+            "
+          >
+            <AttendanceItem
+              label="Present"
+              value={
+                stats.todayAttendance.present
+              }
+              type="present"
+            />
+
+            <AttendanceItem
+              label="Absent"
+              value={
+                stats.todayAttendance.absent
+              }
+              type="absent"
+            />
+
+            <AttendanceItem
+              label="Late"
+              value={
+                stats.todayAttendance.late
+              }
+              type="late"
+            />
+
+            <AttendanceItem
+              label="Half Day"
+              value={
+                stats.todayAttendance.halfDay
+              }
+              type="half"
+            />
           </div>
         </motion.div>
       )}
 
-      {/* Charts row 1 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
-          className="card p-5">
-          <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Employee Growth</h2>
-          <EmployeeGrowthChart data={charts?.growth} loading={chartsLoading} />
-        </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
-          className="card p-5">
-          <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Department Distribution</h2>
-          <DepartmentPieChart data={charts?.deptWise} loading={chartsLoading} />
-        </motion.div>
-      </div>
+      {/* =====================================================
+          CHARTS ROW 1
+      ===================================================== */}
 
-      {/* Charts row 2 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
-          className="card p-5">
-          <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Attendance Trend (7 days)</h2>
-          <AttendanceTrendChart data={charts?.attendanceTrend} loading={chartsLoading} />
-        </motion.div>
+      <div
+        className="
+          grid
+          grid-cols-1
+          xl:grid-cols-5
+          gap-4
+        "
+      >
 
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}
-          className="card p-5">
-          <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Leave Statistics</h2>
-          <LeaveStatsChart data={charts?.leaveStats} loading={chartsLoading} />
-        </motion.div>
-      </div>
+        {/* Employee Growth */}
 
-      {/* Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Recent hires */}
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
-          className="card p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Recent Hires</h2>
-            <Link to="/admin/employees" className="text-xs text-primary-600 hover:text-primary-700 flex items-center gap-1">
-              View all <HiOutlineArrowRight size={12} />
-            </Link>
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: 12,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            delay: 0.35,
+          }}
+          className="
+            xl:col-span-3
+            saas-card
+            p-5
+            md:p-6
+          "
+        >
+          <SectionHeader
+            title="Employee Growth"
+            subtitle="Employee count over time"
+          />
+
+          <div className="h-[300px]">
+            <EmployeeGrowthChart
+              data={charts?.growth}
+              loading={chartsLoading}
+            />
           </div>
-          <div className="space-y-3">
-            {activityLoading
-              ? Array(4).fill(0).map((_, i) => (
-                  <div key={i} className="flex items-center gap-3 animate-pulse">
-                    <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-white/10" />
-                    <div className="flex-1 space-y-1.5">
-                      <div className="h-3 bg-gray-200 dark:bg-white/10 rounded w-32" />
-                      <div className="h-2.5 bg-gray-200 dark:bg-white/10 rounded w-20" />
+        </motion.div>
+
+
+        {/* Department */}
+
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: 12,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            delay: 0.42,
+          }}
+          className="
+            xl:col-span-2
+            saas-card
+            p-5
+            md:p-6
+          "
+        >
+          <SectionHeader
+            title="Department Distribution"
+            subtitle="Employees by department"
+          />
+
+          <div className="h-[300px]">
+            <DepartmentPieChart
+              data={charts?.deptWise}
+              loading={chartsLoading}
+            />
+          </div>
+        </motion.div>
+      </div>
+
+
+      {/* =====================================================
+          CHARTS ROW 2
+      ===================================================== */}
+
+      <div
+        className="
+          grid
+          grid-cols-1
+          xl:grid-cols-2
+          gap-4
+        "
+      >
+
+        {/* Attendance Trend */}
+
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: 12,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            delay: 0.48,
+          }}
+          className="
+            saas-card
+            p-5
+            md:p-6
+          "
+        >
+          <SectionHeader
+            title="Attendance Trend"
+            subtitle="Last 7 days"
+          />
+
+          <div className="h-[300px]">
+            <AttendanceTrendChart
+              data={
+                charts?.attendanceTrend
+              }
+              loading={chartsLoading}
+            />
+          </div>
+        </motion.div>
+
+
+        {/* Leave Statistics */}
+
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: 12,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            delay: 0.55,
+          }}
+          className="
+            saas-card
+            p-5
+            md:p-6
+          "
+        >
+          <SectionHeader
+            title="Leave Statistics"
+            subtitle="Leave requests overview"
+          />
+
+          <div className="h-[300px]">
+            <LeaveStatsChart
+              data={charts?.leaveStats}
+              loading={chartsLoading}
+            />
+          </div>
+        </motion.div>
+      </div>
+
+
+      {/* =====================================================
+          RECENT ACTIVITY
+      ===================================================== */}
+
+      <div
+        className="
+          grid
+          grid-cols-1
+          xl:grid-cols-2
+          gap-4
+        "
+      >
+
+        {/* Recent Hires */}
+
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: 12,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            delay: 0.6,
+          }}
+          className="
+            saas-card
+            p-5
+            md:p-6
+          "
+        >
+          <SectionHeader
+            title="Recent Hires"
+            subtitle="Latest employees added"
+            link="/admin/employees"
+          />
+
+          <div className="space-y-2">
+
+            {activityLoading ? (
+              Array(4)
+                .fill(0)
+                .map((_, i) => (
+                  <div
+                    key={i}
+                    className="
+                      flex
+                      items-center
+                      gap-3
+                      p-3
+                      rounded-xl
+                      animate-pulse
+                    "
+                  >
+                    <div
+                      className="
+                        w-10
+                        h-10
+                        rounded-full
+                        bg-slate-200
+                        dark:bg-white/10
+                      "
+                    />
+
+                    <div
+                      className="
+                        flex-1
+                        space-y-2
+                      "
+                    >
+                      <div
+                        className="
+                          h-3
+                          bg-slate-200
+                          dark:bg-white/10
+                          rounded
+                          w-32
+                        "
+                      />
+
+                      <div
+                        className="
+                          h-2.5
+                          bg-slate-200
+                          dark:bg-white/10
+                          rounded
+                          w-24
+                        "
+                      />
                     </div>
                   </div>
                 ))
-              : activity?.recentHires?.map((emp) => (
-                  <div key={emp._id} className="flex items-center gap-3">
-                    <Avatar src={emp.profileImage} name={emp.firstName} size="md" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-800 dark:text-white truncate">
-                        {emp.firstName} {emp.lastName}
+            ) : (
+              activity?.recentHires?.map(
+                (emp) => (
+                  <div
+                    key={emp._id}
+                    className="
+                      flex
+                      items-center
+                      gap-3
+                      p-3
+                      rounded-xl
+                      hover:bg-slate-50
+                      dark:hover:bg-white/[0.03]
+                      transition-colors
+                    "
+                  >
+                    <Avatar
+                      src={
+                        emp.profileImage
+                      }
+                      name={
+                        emp.firstName
+                      }
+                      size="md"
+                    />
+
+                    <div
+                      className="
+                        flex-1
+                        min-w-0
+                      "
+                    >
+                      <p
+                        className="
+                          text-sm
+                          font-semibold
+                          text-slate-800
+                          dark:text-white
+                          truncate
+                        "
+                      >
+                        {emp.firstName}{' '}
+                        {emp.lastName}
                       </p>
-                      <p className="text-xs text-gray-400 truncate">{emp.designation} · {emp.department?.name}</p>
+
+                      <p
+                        className="
+                          text-xs
+                          text-slate-400
+                          truncate
+                          mt-0.5
+                        "
+                      >
+                        {emp.designation}
+                        {' · '}
+                        {emp.department?.name}
+                      </p>
                     </div>
-                    <p className="text-xs text-gray-400 flex-shrink-0">{formatDate(emp.createdAt)}</p>
+
+                    <p
+                      className="
+                        text-[11px]
+                        text-slate-400
+                        flex-shrink-0
+                      "
+                    >
+                      {formatDate(
+                        emp.createdAt
+                      )}
+                    </p>
                   </div>
-                ))
-            }
+                )
+              )
+            )}
+
           </div>
         </motion.div>
 
-        {/* Recent leaves */}
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.65 }}
-          className="card p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Recent Leave Requests</h2>
-            <Link to="/admin/leaves" className="text-xs text-primary-600 hover:text-primary-700 flex items-center gap-1">
-              View all <HiOutlineArrowRight size={12} />
-            </Link>
-          </div>
-          <div className="space-y-3">
-            {activityLoading
-              ? Array(4).fill(0).map((_, i) => (
-                  <div key={i} className="flex items-center gap-3 animate-pulse">
-                    <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-white/10" />
-                    <div className="flex-1 space-y-1.5">
-                      <div className="h-3 bg-gray-200 dark:bg-white/10 rounded w-32" />
-                      <div className="h-2.5 bg-gray-200 dark:bg-white/10 rounded w-20" />
+
+        {/* Recent Leaves */}
+
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: 12,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            delay: 0.65,
+          }}
+          className="
+            saas-card
+            p-5
+            md:p-6
+          "
+        >
+          <SectionHeader
+            title="Recent Leave Requests"
+            subtitle="Latest leave applications"
+            link="/admin/leaves"
+          />
+
+          <div className="space-y-2">
+
+            {activityLoading ? (
+              Array(4)
+                .fill(0)
+                .map((_, i) => (
+                  <div
+                    key={i}
+                    className="
+                      flex
+                      items-center
+                      gap-3
+                      p-3
+                      rounded-xl
+                      animate-pulse
+                    "
+                  >
+                    <div
+                      className="
+                        w-10
+                        h-10
+                        rounded-full
+                        bg-slate-200
+                        dark:bg-white/10
+                      "
+                    />
+
+                    <div
+                      className="
+                        flex-1
+                        space-y-2
+                      "
+                    >
+                      <div
+                        className="
+                          h-3
+                          bg-slate-200
+                          dark:bg-white/10
+                          rounded
+                          w-32
+                        "
+                      />
+
+                      <div
+                        className="
+                          h-2.5
+                          bg-slate-200
+                          dark:bg-white/10
+                          rounded
+                          w-24
+                        "
+                      />
                     </div>
-                    <div className="h-5 bg-gray-200 dark:bg-white/10 rounded-full w-16" />
+
+                    <div
+                      className="
+                        w-14
+                        h-5
+                        rounded-full
+                        bg-slate-200
+                        dark:bg-white/10
+                      "
+                    />
                   </div>
                 ))
-              : activity?.recentLeaves?.map((leave) => (
-                  <div key={leave._id} className="flex items-center gap-3">
-                    <Avatar src={leave.employee?.profileImage} name={leave.employee?.firstName} size="md" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-800 dark:text-white truncate">
-                        {leave.employee?.firstName} {leave.employee?.lastName}
+            ) : (
+              activity?.recentLeaves?.map(
+                (leave) => (
+                  <div
+                    key={leave._id}
+                    className="
+                      flex
+                      items-center
+                      gap-3
+                      p-3
+                      rounded-xl
+                      hover:bg-slate-50
+                      dark:hover:bg-white/[0.03]
+                      transition-colors
+                    "
+                  >
+                    <Avatar
+                      src={
+                        leave.employee
+                          ?.profileImage
+                      }
+                      name={
+                        leave.employee
+                          ?.firstName
+                      }
+                      size="md"
+                    />
+
+                    <div
+                      className="
+                        flex-1
+                        min-w-0
+                      "
+                    >
+                      <p
+                        className="
+                          text-sm
+                          font-semibold
+                          text-slate-800
+                          dark:text-white
+                          truncate
+                        "
+                      >
+                        {
+                          leave.employee
+                            ?.firstName
+                        }{' '}
+                        {
+                          leave.employee
+                            ?.lastName
+                        }
                       </p>
-                      <p className="text-xs text-gray-400">{leave.leaveType} · {leave.totalDays} day(s)</p>
+
+                      <p
+                        className="
+                          text-xs
+                          text-slate-400
+                          mt-0.5
+                        "
+                      >
+                        {leave.leaveType}
+                        {' · '}
+                        {leave.totalDays}
+                        {' day(s)'}
+                      </p>
                     </div>
-                    <Badge status={leave.status} />
+
+                    <Badge
+                      status={
+                        leave.status
+                      }
+                    />
                   </div>
-                ))
-            }
+                )
+              )
+            )}
+
           </div>
         </motion.div>
       </div>
+
+
+      {/* =====================================================
+          QUICK ACTIONS
+      ===================================================== */}
+
+      <motion.div
+        initial={{
+          opacity: 0,
+          y: 12,
+        }}
+        animate={{
+          opacity: 1,
+          y: 0,
+        }}
+        transition={{
+          delay: 0.7,
+        }}
+        className="
+          saas-card
+          p-5
+          md:p-6
+        "
+      >
+        <SectionHeader
+          title="Quick Actions"
+          subtitle="Frequently used actions"
+        />
+
+        <div
+          className="
+            grid
+            grid-cols-1
+            sm:grid-cols-2
+            lg:grid-cols-4
+            gap-3
+          "
+        >
+          <Link
+            to="/admin/employees/add"
+            className="
+              group
+              flex
+              items-center
+              gap-3
+              p-4
+              rounded-xl
+              border
+              border-slate-100
+              dark:border-white/[0.05]
+              hover:border-indigo-200
+              dark:hover:border-indigo-500/20
+              hover:bg-indigo-50/50
+              dark:hover:bg-indigo-500/[0.04]
+              transition-all
+            "
+          >
+            <div
+              className="
+                w-10
+                h-10
+                rounded-xl
+                bg-indigo-50
+                dark:bg-indigo-500/10
+                text-indigo-600
+                dark:text-indigo-400
+                flex
+                items-center
+                justify-center
+                group-hover:scale-105
+                transition-transform
+              "
+            >
+              <HiOutlinePlus
+                size={19}
+              />
+            </div>
+
+            <div>
+              <p
+                className="
+                  text-sm
+                  font-semibold
+                  text-slate-800
+                  dark:text-white
+                "
+              >
+                Add Employee
+              </p>
+
+              <p
+                className="
+                  text-[11px]
+                  text-slate-400
+                  mt-0.5
+                "
+              >
+                Create employee profile
+              </p>
+            </div>
+          </Link>
+
+
+          <Link
+            to="/admin/employees"
+            className="
+              group
+              flex
+              items-center
+              gap-3
+              p-4
+              rounded-xl
+              border
+              border-slate-100
+              dark:border-white/[0.05]
+              hover:border-indigo-200
+              dark:hover:border-indigo-500/20
+              hover:bg-indigo-50/50
+              dark:hover:bg-indigo-500/[0.04]
+              transition-all
+            "
+          >
+            <div
+              className="
+                w-10
+                h-10
+                rounded-xl
+                bg-violet-50
+                dark:bg-violet-500/10
+                text-violet-600
+                dark:text-violet-400
+                flex
+                items-center
+                justify-center
+                group-hover:scale-105
+                transition-transform
+              "
+            >
+              <HiOutlineUsers
+                size={19}
+              />
+            </div>
+
+            <div>
+              <p
+                className="
+                  text-sm
+                  font-semibold
+                  text-slate-800
+                  dark:text-white
+                "
+              >
+                Manage Employees
+              </p>
+
+              <p
+                className="
+                  text-[11px]
+                  text-slate-400
+                  mt-0.5
+                "
+              >
+                View employee directory
+              </p>
+            </div>
+          </Link>
+
+
+          <Link
+            to="/admin/attendance"
+            className="
+              group
+              flex
+              items-center
+              gap-3
+              p-4
+              rounded-xl
+              border
+              border-slate-100
+              dark:border-white/[0.05]
+              hover:border-indigo-200
+              dark:hover:border-indigo-500/20
+              hover:bg-indigo-50/50
+              dark:hover:bg-indigo-500/[0.04]
+              transition-all
+            "
+          >
+            <div
+              className="
+                w-10
+                h-10
+                rounded-xl
+                bg-emerald-50
+                dark:bg-emerald-500/10
+                text-emerald-600
+                dark:text-emerald-400
+                flex
+                items-center
+                justify-center
+                group-hover:scale-105
+                transition-transform
+              "
+            >
+              <HiOutlineCalendar
+                size={19}
+              />
+            </div>
+
+            <div>
+              <p
+                className="
+                  text-sm
+                  font-semibold
+                  text-slate-800
+                  dark:text-white
+                "
+              >
+                Attendance
+              </p>
+
+              <p
+                className="
+                  text-[11px]
+                  text-slate-400
+                  mt-0.5
+                "
+              >
+                Manage attendance
+              </p>
+            </div>
+          </Link>
+
+
+          <Link
+            to="/admin/leaves"
+            className="
+              group
+              flex
+              items-center
+              gap-3
+              p-4
+              rounded-xl
+              border
+              border-slate-100
+              dark:border-white/[0.05]
+              hover:border-indigo-200
+              dark:hover:border-indigo-500/20
+              hover:bg-indigo-50/50
+              dark:hover:bg-indigo-500/[0.04]
+              transition-all
+            "
+          >
+            <div
+              className="
+                w-10
+                h-10
+                rounded-xl
+                bg-amber-50
+                dark:bg-amber-500/10
+                text-amber-600
+                dark:text-amber-400
+                flex
+                items-center
+                justify-center
+                group-hover:scale-105
+                transition-transform
+              "
+            >
+              <HiOutlineClipboardList
+                size={19}
+              />
+            </div>
+
+            <div>
+              <p
+                className="
+                  text-sm
+                  font-semibold
+                  text-slate-800
+                  dark:text-white
+                "
+              >
+                Leave Requests
+              </p>
+
+              <p
+                className="
+                  text-[11px]
+                  text-slate-400
+                  mt-0.5
+                "
+              >
+                Review leave requests
+              </p>
+            </div>
+          </Link>
+
+        </div>
+      </motion.div>
+
     </div>
   );
 }

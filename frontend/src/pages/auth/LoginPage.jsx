@@ -30,15 +30,15 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-gray-50 dark:bg-[#0f0f13]">
+    <div className="min-h-screen flex bg-slate-50 dark:bg-[#0c0e12]">
       {/* Left decorative panel */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden
-                      bg-gradient-to-br from-primary-600 via-primary-700 to-purple-800">
-        <div className="absolute inset-0 opacity-20">
+      <div className="hidden lg:flex lg:w-[46%] relative overflow-hidden bg-[#111318] border-r border-white/[0.06]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(99,102,241,0.22),transparent_42%),radial-gradient(circle_at_80%_85%,rgba(124,58,237,0.16),transparent_38%)]" />
+        <div className="absolute inset-0 opacity-[0.06]">
           {[...Array(6)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute rounded-full bg-white"
+              className="absolute rounded-full bg-indigo-400 blur-3xl"
               style={{
                 width:  `${80 + i * 60}px`,
                 height: `${80 + i * 60}px`,
@@ -50,26 +50,27 @@ export default function LoginPage() {
             />
           ))}
         </div>
-        <div className="relative z-10 flex flex-col justify-center px-16 text-white">
+        <div className="relative z-10 flex flex-col justify-center px-14 xl:px-20 text-white">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
           >
-            <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-8 shadow-lg">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center mb-7 shadow-lg shadow-indigo-500/20">
               <span className="text-white text-2xl font-black">E</span>
             </div>
-            <h1 className="text-4xl font-black mb-4 leading-tight">
-              Employee<br />Management<br />System
+            <p className="text-xs uppercase tracking-[0.22em] text-indigo-300 font-semibold mb-3">EMS Pro</p>
+            <h1 className="text-4xl xl:text-5xl font-bold mb-4 leading-[1.08] tracking-tight">
+              Your people,<br />managed better.
             </h1>
-            <p className="text-white/70 text-lg leading-relaxed max-w-sm">
+            <p className="text-slate-400 text-base leading-relaxed max-w-sm">
               A modern, full-featured platform for managing your entire workforce — attendance, leaves, and more.
             </p>
             <div className="mt-10 flex gap-6">
               {[['99.9%', 'Uptime'], ['10k+', 'Records'], ['Fast', 'Reports']].map(([v, l]) => (
                 <div key={l}>
                   <div className="text-2xl font-black">{v}</div>
-                  <div className="text-white/60 text-sm">{l}</div>
+                  <div className="text-slate-500 text-xs mt-1">{l}</div>
                 </div>
               ))}
             </div>
@@ -78,12 +79,12 @@ export default function LoginPage() {
       </div>
 
       {/* Right form panel */}
-      <div className="flex-1 flex items-center justify-center px-6 py-12">
+      <div className="flex-1 flex items-center justify-center px-6 py-10 bg-slate-50 dark:bg-[#0c0e12]">
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
-          className="w-full max-w-md"
+          className="w-full max-w-[420px]"
         >
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-2 mb-10">
@@ -93,8 +94,9 @@ export default function LoginPage() {
             <span className="text-xl font-black text-gray-900 dark:text-white">EMS Pro</span>
           </div>
 
-          <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-1">Welcome back</h2>
-          <p className="text-gray-500 dark:text-gray-400 mb-8 text-sm">Sign in to your EMS account</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-indigo-500 mb-3">Admin workspace</p>
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">Welcome back</h2>
+          <p className="text-slate-500 dark:text-slate-400 mb-8 text-sm">Sign in to your EMS Pro account</p>
 
           {/* Demo credentials */}
           <div className="mb-6 p-4 rounded-2xl bg-primary-50 dark:bg-primary-500/10 border border-primary-100 dark:border-primary-500/20">

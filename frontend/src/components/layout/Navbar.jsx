@@ -2,77 +2,295 @@ import { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+
 import {
-  HiOutlineBell, HiOutlineSun, HiOutlineMoon,
-  HiOutlineMenuAlt2, HiOutlineCheckCircle, HiX,
+  HiOutlineBell,
+  HiOutlineSun,
+  HiOutlineMoon,
+  HiOutlineMenuAlt2,
+  HiOutlineCheckCircle,
+  HiOutlineSearch,
 } from 'react-icons/hi';
-import { toggleDarkMode, setSidebarOpen } from '../../features/ui/uiSlice';
-import { fetchNotifications, markRead, markAllRead } from '../../features/notification/notificationSlice';
+
+import {
+  toggleDarkMode,
+  setSidebarOpen,
+} from '../../features/ui/uiSlice';
+
+import {
+  fetchNotifications,
+  markRead,
+  markAllRead,
+} from '../../features/notification/notificationSlice';
+
 import { formatDistanceToNow } from './timeUtils';
 
 const breadcrumbMap = {
-  '/admin':                 'Dashboard',
-  '/admin/employees':       'Employees',
-  '/admin/employees/add':   'Add Employee',
-  '/admin/departments':     'Departments',
-  '/admin/attendance':      'Attendance',
-  '/admin/leaves':          'Leave Management',
-  '/admin/analytics':       'Analytics',
-  '/employee':              'Dashboard',
-  '/employee/profile':      'My Profile',
-  '/employee/attendance':   'My Attendance',
-  '/employee/leaves':       'Leave History',
+  '/admin': 'Dashboard',
+  '/admin/employees': 'Employees',
+  '/admin/employees/add': 'Add Employee',
+  '/admin/departments': 'Departments',
+  '/admin/attendance': 'Attendance',
+  '/admin/leaves': 'Leave Management',
+  '/admin/analytics': 'Analytics',
+
+  '/employee': 'Dashboard',
+  '/employee/profile': 'My Profile',
+  '/employee/attendance': 'My Attendance',
+  '/employee/leaves': 'Leave History',
   '/employee/leaves/apply': 'Apply Leave',
 };
 
 export default function Navbar() {
-  const dispatch   = useDispatch();
-  const location   = useLocation();
-  const darkMode   = useSelector((s) => s.ui.darkMode);
-  const { list: notifications, unreadCount } = useSelector((s) => s.notifications);
-  const user       = useSelector((s) => s.auth.user);
-  const [notifOpen, setNotifOpen] = useState(false);
-  const notifRef   = useRef(null);
+  const dispatch = useDispatch();
+  const location = useLocation();
 
-  const title = breadcrumbMap[location.pathname] || 'EMS Pro';
+  const darkMode = useSelector(
+    (s) => s.ui.darkMode
+  );
 
-  useEffect(() => { dispatch(fetchNotifications()); }, []);
+  const {
+    list: notifications,
+    unreadCount,
+  } = useSelector(
+    (s) => s.notifications
+  );
+
+  const user = useSelector(
+    (s) => s.auth.user
+  );
+
+  const [notifOpen, setNotifOpen] =
+    useState(false);
+
+  const notifRef = useRef(null);
+
+  const title =
+    breadcrumbMap[location.pathname] ||
+    'EMS Pro';
 
   useEffect(() => {
-    const handler = (e) => { if (notifRef.current && !notifRef.current.contains(e.target)) setNotifOpen(false); };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+    dispatch(fetchNotifications());
+  }, [dispatch]);
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (
+        notifRef.current &&
+        !notifRef.current.contains(e.target)
+      ) {
+        setNotifOpen(false);
+      }
+    };
+
+    document.addEventListener(
+      'mousedown',
+      handler
+    );
+
+    return () => {
+      document.removeEventListener(
+        'mousedown',
+        handler
+      );
+    };
   }, []);
 
+  const formattedDate =
+    new Date().toLocaleDateString(
+      'en-US',
+      {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      }
+    );
+
   return (
-    <header className="h-16 flex-shrink-0 flex items-center justify-between px-4 md:px-6
-                       bg-white dark:bg-[#13131f] border-b border-gray-100 dark:border-white/5 sticky top-0 z-10">
-      <div className="flex items-center gap-3">
-        <button onClick={() => dispatch(setSidebarOpen())}
-          className="md:hidden p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10">
+    <header
+      className="
+        h-[72px]
+        flex-shrink-0
+        sticky top-0
+        z-30
+        flex items-center
+        justify-between
+        px-4 md:px-7
+        bg-white/90
+        dark:bg-[#111318]/90
+        backdrop-blur-xl
+        border-b
+        border-slate-200/70
+        dark:border-white/[0.06]
+      "
+    >
+      {/* Left */}
+      <div className="flex items-center gap-4">
+        <button
+          onClick={() =>
+            dispatch(setSidebarOpen())
+          }
+          className="
+            md:hidden
+            w-9 h-9
+            rounded-xl
+            flex items-center justify-center
+            text-slate-500
+            hover:bg-slate-100
+            dark:hover:bg-white/[0.06]
+          "
+        >
           <HiOutlineMenuAlt2 size={20} />
         </button>
+
         <div>
-          <h1 className="text-base font-semibold text-gray-900 dark:text-white">{title}</h1>
-          <p className="text-xs text-gray-400 hidden sm:block">
-            {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+          <div className="flex items-center gap-2">
+            <h1
+              className="
+                text-lg
+                font-bold
+                tracking-tight
+                text-slate-900
+                dark:text-white
+              "
+            >
+              {title}
+            </h1>
+          </div>
+
+          <p
+            className="
+              hidden sm:block
+              text-xs
+              text-slate-400
+              mt-0.5
+            "
+          >
+            {formattedDate}
           </p>
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
-        <button onClick={() => dispatch(toggleDarkMode())}
-          className="p-2 rounded-xl text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-700 dark:hover:text-white transition-colors">
-          {darkMode ? <HiOutlineSun size={18} /> : <HiOutlineMoon size={18} />}
+      {/* Right */}
+      <div className="flex items-center gap-2 md:gap-3">
+        {/* Search */}
+        <button
+          className="
+            hidden md:flex
+            items-center gap-2
+            h-10
+            px-3
+            min-w-[180px]
+            rounded-xl
+            border
+            border-slate-200
+            dark:border-white/[0.07]
+            bg-slate-50
+            dark:bg-white/[0.03]
+            text-slate-400
+            hover:border-indigo-200
+            dark:hover:border-indigo-500/30
+            transition-all
+          "
+        >
+          <HiOutlineSearch size={17} />
+
+          <span className="text-xs">
+            Search anything...
+          </span>
+
+          <span
+            className="
+              ml-auto
+              text-[10px]
+              px-1.5 py-0.5
+              rounded-md
+              bg-white
+              dark:bg-white/[0.06]
+              border
+              border-slate-200
+              dark:border-white/[0.06]
+            "
+          >
+            ⌘K
+          </span>
         </button>
 
-        <div className="relative" ref={notifRef}>
-          <button onClick={() => setNotifOpen(!notifOpen)}
-            className="relative p-2 rounded-xl text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-700 dark:hover:text-white transition-colors">
-            <HiOutlineBell size={18} />
+        {/* Theme */}
+        <button
+          onClick={() =>
+            dispatch(toggleDarkMode())
+          }
+          className="
+            w-10 h-10
+            rounded-xl
+            flex items-center justify-center
+            text-slate-500
+            dark:text-slate-400
+            hover:bg-slate-100
+            hover:text-slate-900
+            dark:hover:bg-white/[0.06]
+            dark:hover:text-white
+            transition-all
+          "
+        >
+          {darkMode ? (
+            <HiOutlineSun size={19} />
+          ) : (
+            <HiOutlineMoon size={19} />
+          )}
+        </button>
+
+        {/* Notifications */}
+        <div
+          className="relative"
+          ref={notifRef}
+        >
+          <button
+            onClick={() =>
+              setNotifOpen(!notifOpen)
+            }
+            className="
+              relative
+              w-10 h-10
+              rounded-xl
+              flex items-center justify-center
+              text-slate-500
+              dark:text-slate-400
+              hover:bg-slate-100
+              hover:text-slate-900
+              dark:hover:bg-white/[0.06]
+              dark:hover:text-white
+              transition-all
+            "
+          >
+            <HiOutlineBell size={19} />
+
             {unreadCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center">
-                {unreadCount > 9 ? '9+' : unreadCount}
+              <span
+                className="
+                  absolute
+                  top-1
+                  right-1
+                  min-w-[16px]
+                  h-4
+                  px-1
+                  rounded-full
+                  bg-red-500
+                  text-white
+                  text-[9px]
+                  font-bold
+                  flex items-center
+                  justify-center
+                  border-2
+                  border-white
+                  dark:border-[#111318]
+                "
+              >
+                {unreadCount > 9
+                  ? '9+'
+                  : unreadCount}
               </span>
             )}
           </button>
@@ -80,44 +298,217 @@ export default function Navbar() {
           <AnimatePresence>
             {notifOpen && (
               <motion.div
-                initial={{ opacity: 0, y: 8, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 8, scale: 0.95 }} transition={{ duration: 0.15 }}
-                className="absolute right-0 top-12 w-80 card shadow-card-lg z-50 overflow-hidden"
+                initial={{
+                  opacity: 0,
+                  y: 8,
+                  scale: 0.97,
+                }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                  scale: 1,
+                }}
+                exit={{
+                  opacity: 0,
+                  y: 8,
+                  scale: 0.97,
+                }}
+                transition={{
+                  duration: 0.15,
+                }}
+                className="
+                  absolute
+                  right-0
+                  top-12
+                  w-[340px]
+                  max-w-[calc(100vw-2rem)]
+                  rounded-2xl
+                  overflow-hidden
+                  bg-white
+                  dark:bg-[#181a21]
+                  border
+                  border-slate-200
+                  dark:border-white/[0.07]
+                  shadow-2xl
+                  shadow-slate-900/10
+                  z-50
+                "
               >
-                <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-white/10">
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Notifications</h3>
+                {/* Header */}
+                <div
+                  className="
+                    px-4
+                    py-3.5
+                    flex items-center
+                    justify-between
+                    border-b
+                    border-slate-100
+                    dark:border-white/[0.06]
+                  "
+                >
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                      Notifications
+                    </h3>
+
+                    <p className="text-[10px] text-slate-400 mt-0.5">
+                      Stay updated with your workspace
+                    </p>
+                  </div>
+
                   {unreadCount > 0 && (
-                    <button onClick={() => dispatch(markAllRead())}
-                      className="text-xs text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1">
-                      <HiOutlineCheckCircle size={14} /> Mark all read
+                    <button
+                      onClick={() =>
+                        dispatch(markAllRead())
+                      }
+                      className="
+                        text-xs
+                        font-medium
+                        text-indigo-600
+                        dark:text-indigo-400
+                        flex items-center gap-1
+                        hover:text-indigo-700
+                      "
+                    >
+                      <HiOutlineCheckCircle
+                        size={14}
+                      />
+
+                      Mark all
                     </button>
                   )}
                 </div>
-                <div className="max-h-80 overflow-y-auto divide-y divide-gray-50 dark:divide-white/5">
+
+                {/* List */}
+                <div className="max-h-[360px] overflow-y-auto">
                   {notifications.length === 0 ? (
-                    <div className="py-8 text-center text-sm text-gray-400">No notifications</div>
-                  ) : notifications.map((n) => (
-                    <div key={n._id} onClick={() => { if (!n.isRead) dispatch(markRead(n._id)); }}
-                      className={`px-4 py-3 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer transition-colors
-                        ${!n.isRead ? 'bg-primary-50/50 dark:bg-primary-500/5' : ''}`}>
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          <p className="text-xs font-semibold text-gray-900 dark:text-white">{n.title}</p>
-                          <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{n.message}</p>
-                          <p className="text-[10px] text-gray-400 mt-1">{formatDistanceToNow(n.createdAt)}</p>
-                        </div>
-                        {!n.isRead && <span className="w-2 h-2 rounded-full bg-primary-500 flex-shrink-0 mt-1" />}
+                    <div className="py-12 text-center">
+                      <div
+                        className="
+                          mx-auto
+                          w-10 h-10
+                          rounded-full
+                          bg-slate-100
+                          dark:bg-white/[0.05]
+                          flex items-center
+                          justify-center
+                          text-slate-400
+                        "
+                      >
+                        <HiOutlineBell
+                          size={18}
+                        />
                       </div>
+
+                      <p className="text-sm text-slate-500 mt-3">
+                        No notifications
+                      </p>
                     </div>
-                  ))}
+                  ) : (
+                    notifications.map((n) => (
+                      <div
+                        key={n._id}
+                        onClick={() => {
+                          if (!n.isRead) {
+                            dispatch(
+                              markRead(n._id)
+                            );
+                          }
+                        }}
+                        className={`
+                          px-4 py-3.5
+                          cursor-pointer
+                          border-b
+                          border-slate-50
+                          dark:border-white/[0.04]
+                          hover:bg-slate-50
+                          dark:hover:bg-white/[0.03]
+                          transition-colors
+                          ${
+                            !n.isRead
+                              ? 'bg-indigo-50/50 dark:bg-indigo-500/[0.04]'
+                              : ''
+                          }
+                        `}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div
+                            className="
+                              mt-0.5
+                              w-8 h-8
+                              flex-shrink-0
+                              rounded-lg
+                              bg-indigo-50
+                              dark:bg-indigo-500/10
+                              text-indigo-600
+                              dark:text-indigo-400
+                              flex items-center
+                              justify-center
+                            "
+                          >
+                            <HiOutlineBell
+                              size={15}
+                            />
+                          </div>
+
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-start justify-between gap-2">
+                              <p className="text-xs font-semibold text-slate-800 dark:text-white">
+                                {n.title}
+                              </p>
+
+                              {!n.isRead && (
+                                <span
+                                  className="
+                                    mt-1
+                                    w-1.5 h-1.5
+                                    rounded-full
+                                    bg-indigo-500
+                                    flex-shrink-0
+                                  "
+                                />
+                              )}
+                            </div>
+
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                              {n.message}
+                            </p>
+
+                            <p className="text-[10px] text-slate-400 mt-1.5">
+                              {formatDistanceToNow(
+                                n.createdAt
+                              )}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
 
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold shadow-glow cursor-pointer">
-          {user?.name?.[0]?.toUpperCase() || 'U'}
+        {/* Profile */}
+        <div
+          className="
+            ml-1
+            w-10 h-10
+            rounded-xl
+            flex items-center justify-center
+            bg-gradient-to-br
+            from-indigo-500
+            to-violet-600
+            text-white
+            text-sm
+            font-bold
+            shadow-lg
+            shadow-indigo-500/20
+          "
+        >
+          {user?.name?.[0]?.toUpperCase() ||
+            'U'}
         </div>
       </div>
     </header>
