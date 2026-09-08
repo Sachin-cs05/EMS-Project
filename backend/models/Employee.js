@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const employeeSchema = new mongoose.Schema(
   {
-    employeeId:  { type: String, unique: true, uppercase: true },
+    employeeId: {type: String, unique: true, uppercase: true, trim: true, immutable: true,},
     userId:      { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
     firstName:   { type: String, required: true, trim: true },
     lastName:    { type: String, required: true, trim: true },
@@ -39,9 +39,29 @@ employeeSchema.virtual('fullName').get(function () {
 });
 
 employeeSchema.pre('save', async function (next) {
-  if (!this.isNew) return next();
-  const count = await mongoose.model('Employee').countDocuments();
-  this.employeeId = `EMP-${String(count + 1).padStart(4, '0')}`;
+  if (!this.isNew || this.employeeId) return next();
+
+  const lastEmployee = await mongoose
+    .model('Employee')
+    .findOne({ employeeId: /^EMP-\d+$/ })
+    .sort({ employeeId: -1 })
+    .select('employeeId');
+
+  let nextNumber = 1;
+
+  if (lastEmployee?.employeeId) {
+    const lastNumber = parseInt(
+      lastEmployee.employeeId.replace('EMP-', ''),
+      10
+    );
+
+    if (!Number.isNaN(lastNumber)) {
+      nextNumber = lastNumber + 1;
+    }
+  }
+
+  this.employeeId = `EMP-${String(nextNumber).padStart(4, '0')}`;
+
   next();
 });
 

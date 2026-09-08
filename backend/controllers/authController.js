@@ -5,6 +5,7 @@ import generateToken from '../utils/generateToken.js';
 import sendEmail from '../utils/sendEmail.js';
 import ApiError from '../utils/ApiError.js';
 import ApiResponse from '../utils/ApiResponse.js';
+import validatePassword from '../utils/passwordValidator.js';
 
 // ─── LOGIN ────────────────────────────────────────────────────────────────────
 export const login = async (req, res, next) => {
@@ -95,8 +96,10 @@ export const changePassword = async (req, res, next) => {
     if (!currentPassword || !newPassword) {
       return next(new ApiError(400, 'Both current and new passwords are required'));
     }
-    if (newPassword.length < 6) {
-      return next(new ApiError(400, 'New password must be at least 6 characters'));
+    const passwordError = validatePassword(newPassword);
+
+    if (passwordError) {
+      return next(new ApiError(400, passwordError));
     }
 
     const user = await User.findById(req.user._id).select('+password');
@@ -167,8 +170,10 @@ export const resetPassword = async (req, res, next) => {
     const { token } = req.params;
     const { password } = req.body;
 
-    if (!password || password.length < 6) {
-      return next(new ApiError(400, 'Password must be at least 6 characters'));
+    const passwordError = validatePassword(password);
+
+    if (passwordError) {
+      return next(new ApiError(400, passwordError));
     }
 
     const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
